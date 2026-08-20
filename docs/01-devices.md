@@ -52,22 +52,32 @@ Published to MQTT on `home/climate` (retained), see
 ### Thermostat (logical signal)
 
 Implemented as hysteresis-based logic in
-`scripts/gateway/climate-monitor.js` (see `adr/0005-*` — no physical
-heating actuator is available in this deployment; Shelly Plug S is
-already allocated to humidity control).
+`scripts/gateway/climate-monitor.js` (see `adr/0005-*` and
+`adr/0006-*` — no physical heating or cooling actuator is available in
+this deployment; Shelly Plug S is already allocated to humidity
+control).
 
-Exposed via three virtual components on the gateway:
+Exposed via four virtual components on the gateway:
 - `number:200` — Setpoint temperature, editable from the Shelly app
 - `boolean:201` — Heating Demand, read-only indicator
-- `boolean:202` — Thermostat Enabled, Off/Auto toggle
+- `boolean:202` — Thermostat HEATING, mode toggle
+- `boolean:203` — Thermostat COOLING, mode toggle
+
+`boolean:202` and `boolean:203` are mutually exclusive — switching one
+on switches the other off. Both off means the thermostat is Off.
 
 Behavior:
-- Auto mode: heating demand turns on when temperature drops below
+- Heating mode: demand turns on when temperature drops below
   `setpoint - 0.5°C`, and off above `setpoint + 0.5°C` (hysteresis
   deadband, prevents rapid toggling).
-- Off mode: heating demand is forced off regardless of temperature.
-  The setpoint value is preserved (not reset) when switching back to
-  Auto.
+- Cooling mode: the same comparison inverted — demand turns on above
+  `setpoint + 0.5°C` and off below `setpoint - 0.5°C`.
+- Off mode: demand is forced off regardless of temperature. The
+  setpoint value is preserved (not reset) when switching back into
+  Heating or Cooling.
+
+The demand flag keeps the name `heating_demand` in both modes; in
+cooling mode a true value means cooling demand (see `adr/0006-*`).
 
 Published to MQTT on `home/thermostat` (retained).
 ### Shelly Plug S Gen3

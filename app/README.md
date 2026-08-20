@@ -51,7 +51,14 @@ python main.py
 ## Status
 
 Working: live MQTT consumption, decoding, and a dark-themed window
-showing current values for all five topics.
+showing current values for all five topics. The connection indicator
+is driven by the broker's real connect/disconnect callbacks.
+
+A payload that fails to decode is logged and dropped without stopping
+the stream — see `docs/09-troubleshooting.md` for why that guard
+exists. The thermostat card reads `mode` together with
+`heating_demand`, so an active demand is labelled correctly in
+cooling mode (`adr/0006-*`).
 
 The UI intentionally shows only *current* values — no history or
 graphs.

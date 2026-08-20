@@ -10,6 +10,7 @@ ctk.set_default_color_theme("blue")
 
 GOOD_COLOR = "#4caf50"
 WARN_COLOR = "#f5a623"
+COOL_COLOR = "#4aa3f0"
 IDLE_COLOR = "#8a8a99"
 TEXT_COLOR = "#e8e8ec"
 
@@ -84,12 +85,17 @@ class MonitorWindow:
             text_color=WARN_COLOR if plug_on else IDLE_COLOR,
         )
 
-    def update_thermostat(self, enabled: bool, setpoint: float, heating_demand: bool):
-        mode = "Auto" if enabled else "Off"
-        demand = "Heating" if heating_demand else "Idle"
-        color = WARN_COLOR if heating_demand else IDLE_COLOR
+    def update_thermostat(self, mode: str, setpoint: float, demand: bool):
+        # The gateway reuses the heating_demand field for cooling, so the
+        # mode decides what an active demand actually means.
+        if not demand or mode == "off":
+            label, color = "Idle", IDLE_COLOR
+        elif mode == "cooling":
+            label, color = "Active", COOL_COLOR
+        else:
+            label, color = "Active", WARN_COLOR
         self.labels["thermostat"].configure(
-            text=f"{mode} · {setpoint}°C · {demand}", text_color=color
+            text=f"{mode.capitalize()} · {setpoint:g}°C · {label}", text_color=color
         )
 
     def run(self):

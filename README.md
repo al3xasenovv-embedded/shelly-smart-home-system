@@ -29,9 +29,10 @@ The full task text is in [docs/00-overview.md](docs/00-overview.md).
 **Requirement 3 caveat:** the provided hardware includes no heating
 relay or TRV, and the only controllable actuator (Shelly Plug S) is
 allocated to humidity control. The thermostat therefore computes a
-*heating demand* boolean with full hysteresis logic and exposes it via
-a virtual component and MQTT, but switches no physical load. See
-[ADR-0005](adr/0005-thermostat-as-logical-signal.md).
+*demand* boolean with full hysteresis logic in both heating and cooling
+mode, and exposes it via a virtual component and MQTT, but switches no
+physical load. See [ADR-0005](adr/0005-thermostat-as-logical-signal.md)
+and [ADR-0006](adr/0006-thermostat-cooling-mode.md).
 
 ## Hardware
 
@@ -107,7 +108,7 @@ above is the rendered version of `architecture.mmd`.
 | [architecture.mmd](diagrams/architecture.mmd) | Full system topology: sensors, gateway scripts, broker, app, and the direct HTTP path to the Plug S |
 | [presence-state-machine.mmd](diagrams/presence-state-machine.mmd) | Home/Away toggle driven by `single_push`, and what each transition publishes |
 | [window-state-machine.mmd](diagrams/window-state-machine.mmd) | Closed / Tilted / Open transitions, including the asynchronous arrival of contact and rotation |
-| [thermostat-logic.mmd](diagrams/thermostat-logic.mmd) | Enabled check, hysteresis deadband, and the resulting heating-demand decision |
+| [thermostat-logic.mmd](diagrams/thermostat-logic.mmd) | Mode selection (Off / Heating / Cooling), hysteresis deadband, and the resulting demand decision |
 | [humidity-control-logic.mmd](diagrams/humidity-control-logic.mmd) | Hysteresis thresholds, anti-short-cycle cooldown, and the stale-data fail-safe |
 
 ## MQTT topics
@@ -121,7 +122,7 @@ connects late immediately receives the current state.
 | `home/window` | `{"state": "closed" / "tilted" / "open", "ts": int}` |
 | `home/climate` | `{"temperature": float, "humidity": float, "battery": float, "ts": int}` |
 | `home/humidity-control` | `{"plug_on": bool, "ts": int}` |
-| `home/thermostat` | `{"enabled": bool, "setpoint": float, "heating_demand": bool, "current_temp": float, "ts": int}` |
+| `home/thermostat` | `{"mode": "off"/"heating"/"cooling", "setpoint": float, "heating_demand": bool, "current_temp": float, "ts": int}` |
 
 ### Control logic
 
@@ -130,7 +131,9 @@ connects late immediately receives the current state.
 | Humidity control | Plug on at 60% RH and above, off at 55% RH and below (hysteresis) |
 | Anti short-cycle | Minimum 180 s between plug switches |
 | Stale-data fail-safe | Plug forced off if no reading for 600 s |
-| Thermostat | Heating demand on below `setpoint - 0.5 °C`, off above `setpoint + 0.5 °C` |
+| Thermostat — heating | Demand on below `setpoint - 0.5 °C`, off above `setpoint + 0.5 °C` |
+| Thermostat — cooling | The inverse: demand on above `setpoint + 0.5 °C`, off below `setpoint - 0.5 °C` |
+| Thermostat — off | Demand forced off; the setpoint is preserved, not reset |
 
 ### Virtual components on the gateway
 
@@ -142,8 +145,9 @@ this firmware.
 |---|---|---|
 | `boolean:200` | Home/Away | Presence state, visible in the Shelly app |
 | `number:200` | Thermostat Setpoint | Target temperature, editable in the app |
-| `boolean:201` | Heating Demand | Read-only thermostat output |
-| `boolean:202` | Thermostat Enabled | Off / Auto mode |
+| `boolean:201` | Heating Demand | Read-only thermostat output (means cooling demand in cooling mode) |
+| `boolean:202` | Thermostat HEATING | Mode toggle, mutually exclusive with COOLING |
+| `boolean:203` | Thermostat COOLING | Mode toggle, mutually exclusive with HEATING |
 
 ## Repository layout
 
@@ -239,14 +243,17 @@ Add images to images/ and reference them here. Suggested set:
 | [0003](adr/0003-mqtt-over-http-polling.md) | MQTT chosen over HTTP polling |
 | [0004](adr/0004-consolidate-climate-scripts.md) | Climate, humidity control, and thermostat consolidated into one script |
 | [0005](adr/0005-thermostat-as-logical-signal.md) | Thermostat implemented as a logical heating-demand signal |
+| [0006](adr/0006-thermostat-cooling-mode.md) | Cooling mode via two mutually-exclusive mode toggles |
 
 ## Known limitations
 
-- The thermostat drives no physical actuator (see requirement 3 above).
+- The thermostat drives no physical actuator, in either heating or
+  cooling mode (see requirement 3 above).
+- The demand flag is published as `heating_demand` in both modes; in
+  cooling mode a true value means cooling demand. Consumers must read
+  `mode` alongside it — see [ADR-0006](adr/0006-thermostat-cooling-mode.md).
 - Presence is an explicit button toggle, not passive BLE proximity — a
   deliberate choice, see [ADR-0002](adr/0002-use-button-as-presence-token.md).
-- The app's connection indicator turns green on a fixed 800 ms timer
-  rather than reflecting real broker connection state.
 - The UI shows current values only, with no history or graphs.
 - The setpoint slider in the Shelly app may report "Failed to apply
   setting" while the value is in fact applied correctly — an app UI

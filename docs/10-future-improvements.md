@@ -29,17 +29,24 @@ reservations in the router before any long-term deployment.
 ## TLS for MQTT
 
 The broker currently runs without TLS, acceptable for a local network
-but not for any deployment with untrusted network segments. See
-`adr/0003-*` (or wherever the TLS decision is recorded) for the
-current rationale.
+but not for any deployment with untrusted network segments. No ADR
+records this decision — it was a default rather than a deliberate
+choice, and deserves one if the system ever leaves the LAN.
 
-## Physical heating actuator
+## Physical heating and cooling actuators
 
-The thermostat currently outputs a logical "heating demand" signal
-only, with no physical actuator (see
-`adr/0005-thermostat-as-logical-signal.md`). Adding a relay or TRV
-would let the existing decision logic directly drive real hardware
-without changes to the hysteresis logic itself.
+The thermostat currently outputs a logical demand signal only, with no
+physical actuator in either mode (see
+`adr/0005-thermostat-as-logical-signal.md` and
+`adr/0006-thermostat-cooling-mode.md`). Adding a relay or TRV for
+heating, and a switchable outlet for a cooling appliance, would let the
+existing decision logic drive real hardware without changes to the
+hysteresis logic itself.
+
+A cleaner demand field would come with that work: `heating_demand` is
+a misnomer in cooling mode, kept only for compatibility. Driving two
+separate actuators is the natural moment to split it into explicit
+heating and cooling outputs.
 
 ## Automated testing
 
@@ -55,8 +62,6 @@ All testing performed so far was manual and interactive (see
 - Historical graphs (temperature/humidity over time) — deliberately
   out of scope for v1; the UI shows live values only. Adding them
   would require a persistence layer, which the app does not have.
-- Real MQTT connection-state tracking in the UI, replacing the current
-  fixed-delay `after(800, ...)` approximation.
 - Manual controls from the app (e.g. override the humidity control
   plug, change thermostat mode) — the app is currently read-only by
   design (see `adr/0001-*`), but a controlled write path could be

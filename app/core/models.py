@@ -36,7 +36,7 @@ class HumidityControlState:
 
 @dataclass
 class ThermostatState:
-    enabled: bool
+    mode: str  # "off" | "heating" | "cooling"
     setpoint: float
     heating_demand: bool
     current_temp: Optional[float]

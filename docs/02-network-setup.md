@@ -12,7 +12,8 @@ Local Mosquitto instance running on the development machine.
 - Host: `192.168.100.5`
 - Port: `1883`
 - Authentication: username/password (not committed to this repository)
-- TLS: disabled — see `adr/000X-no-tls-local-network.md`
+- TLS: disabled — acceptable on a trusted LAN, revisited in
+  `docs/10-future-improvements.md`
 
 Setup steps and issues encountered are documented in
 `docs/09-troubleshooting.md` (notably: running as a Windows Service
@@ -37,10 +38,10 @@ calls to the Plug S. See `docs/10-future-improvements.md`.
 Inbound MQTT traffic (port 1883) must be allowed on the broker
 machine:
 
-\`\`\`powershell
+```powershell
 New-NetFirewallRule -DisplayName "MQTT 1883" -Direction Inbound -Protocol TCP -LocalPort 1883 -Action Allow
-\`\`\`
+```
 
 ## Topology
 
-See `diagrams/device-topology.mmd` for the full data flow diagram.
+See `diagrams/architecture.mmd` for the full data flow diagram.

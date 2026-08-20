@@ -27,12 +27,17 @@ including edge cases discovered and verified during development.
 
 | Test | Result |
 |---|---|
-| Temperature below setpoint - deadband → heating demand ON | ✅ Verified via console injection (`evaluateThermostat()`) and via real sensor readings |
-| Temperature above setpoint + deadband → heating demand OFF | ✅ |
+| Heating mode: temperature below setpoint - deadband → demand ON | ✅ Verified via console injection (`evaluateThermostat()`) and via real sensor readings |
+| Heating mode: temperature above setpoint + deadband → demand OFF | ✅ |
 | Temperature within deadband → state unchanged (hysteresis) | ✅ Verified no toggling when injecting a mid-range value |
 | Setpoint change from the app updates behavior live | ✅ Verified via direct RPC (`Number.Set`) — app UI itself shows a "Failed to apply setting" error, but the underlying value and script behavior are correct (see `docs/09-troubleshooting.md`) |
-| Thermostat Enabled = Off forces heating demand off | ✅ |
-| Setpoint is preserved (not reset) when re-enabling | ✅ By design, not implemented as an automatic reset |
+| Off mode (both toggles off) forces demand off | ✅ Verified before the cooling change, when Off was a single `Thermostat Enabled` toggle |
+| Setpoint is preserved (not reset) when leaving Off | ✅ By design, not implemented as an automatic reset |
+| Cooling mode: temperature above setpoint + deadband → demand ON | ⬜ Not yet tested |
+| Cooling mode: temperature below setpoint - deadband → demand OFF | ⬜ Not yet tested |
+| HEATING and COOLING toggles are mutually exclusive in the app | ⬜ Not yet tested |
+| `boolean:203` exists and is seeded correctly on script start | ⬜ Not yet tested |
+| Mode survives a gateway reboot (seeded from component status) | ⬜ Not yet tested |
 
 ## Automatic humidity control
 
@@ -58,6 +63,12 @@ including edge cases discovered and verified during development.
 | All 5 MQTT topics decode correctly on connect (retained messages) | ✅ |
 | UI reflects live state (presence, window, climate, humidity control, thermostat) | ✅ |
 | App correctly displays retained state even if started after the gateway | ✅ |
+| A changed payload shape does not kill the MQTT loop | ✅ Bug found and fixed — the `mode` field broke `decode()` and the unguarded exception killed the network thread, freezing every update (see `docs/09-troubleshooting.md`) |
+| Malformed / non-JSON payloads are dropped without stopping the stream | ✅ Verified by injecting a truncated payload and non-JSON bytes |
+| Legacy `enabled` payload still decodes (stale retained message) | ✅ Decoded as heating/off by `_thermostat_mode()` |
+| Connection indicator reflects real broker state | ✅ Driven by the paho connect/disconnect callbacks, no longer a fixed timer |
+| Thermostat card labels cooling demand as cooling, not heating | ✅ Verified for all three modes |
+| Live end-to-end run against the gateway after the cooling change | ⬜ Not yet tested |
 
 ## Known gaps / not tested
 

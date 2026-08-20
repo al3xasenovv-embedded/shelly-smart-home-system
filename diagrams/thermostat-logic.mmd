@@ -1,17 +1,27 @@
 flowchart TD
-Start(["New temperature reading<br/>or setpoint/enabled change"]) --> CheckEnabled{"Thermostat<br/>Enabled?"}
+Start(["New temperature reading<br/>or setpoint/mode change"]) --> CheckMode{"Thermostat mode?<br/>(boolean:202 / boolean:203)"}
 
-CheckEnabled -- "No (Off)" --> ForceOff["Force heating_demand = false"]
+CheckMode -- "Off (both toggles off)" --> ForceOff["Force heating_demand = false"]
 ForceOff --> Publish
 
-CheckEnabled -- "Yes (Auto)" --> CheckTemp{"Compare temperature<br/>to setpoint ± 0.5°C"}
+CheckMode -- "Heating" --> HeatCmp{"Compare temperature<br/>to setpoint ± 0.5°C"}
+CheckMode -- "Cooling" --> CoolCmp{"Compare temperature<br/>to setpoint ± 0.5°C"}
 
-CheckTemp -- "temp < setpoint - 0.5" --> TurnOn["heating_demand = true"]
-CheckTemp -- "temp > setpoint + 0.5" --> TurnOff["heating_demand = false"]
-CheckTemp -- "within deadband" --> Keep["Keep current heating_demand<br/>(hysteresis, no change)"]
+HeatCmp -- "temp < setpoint - 0.5" --> HeatOn["heating_demand = true<br/>(heating demand)"]
+HeatCmp -- "temp > setpoint + 0.5" --> HeatOff["heating_demand = false"]
+HeatCmp -- "within deadband" --> Keep["Keep current heating_demand<br/>(hysteresis, no change)"]
 
-TurnOn --> Publish
-TurnOff --> Publish
+CoolCmp -- "temp > setpoint + 0.5" --> CoolOn["heating_demand = true<br/>(cooling demand)"]
+CoolCmp -- "temp < setpoint - 0.5" --> CoolOff["heating_demand = false"]
+CoolCmp -- "within deadband" --> Keep
+
+HeatOn --> Publish
+HeatOff --> Publish
+CoolOn --> Publish
+CoolOff --> Publish
 Keep --> Publish
 
-Publish["Publish to MQTT: home/thermostat<br/>Update boolean:201 (Heating Demand)"] --> End(["Done"])
+Publish["Publish to MQTT: home/thermostat<br/>{mode, setpoint, heating_demand, current_temp}<br/>Update boolean:201 (Heating Demand)"] --> End(["Done"])
+
+ModeSwitch(["HEATING or COOLING toggled in the Shelly app"]) --> Exclusive["Switch the other toggle off<br/>(in memory and on the component)"]
+Exclusive --> CheckMode

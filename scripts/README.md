@@ -51,11 +51,13 @@ see docs/09-troubleshooting.md and adr/0004-*) handling:
    protection and a stale-data fail-safe. Publishes to
    `home/humidity-control` (retained).
 
-3. **Thermostat** — hysteresis-based heating-demand logic (logical
-   signal only, no physical actuator — see `adr/0005-*`). Setpoint and
-   Off/Auto mode are controlled via virtual components
-   (`number:200`, `boolean:202`), editable from the Shelly app.
-   Publishes to `home/thermostat` (retained).
+3. **Thermostat** — hysteresis-based demand logic with three modes,
+   Off / Heating / Cooling (logical signal only, no physical actuator —
+   see `adr/0005-*` and `adr/0006-*`). Cooling inverts the heating
+   comparison. Setpoint and mode are controlled via virtual components
+   (`number:200`, plus the mutually-exclusive `boolean:202` HEATING and
+   `boolean:203` COOLING), editable from the Shelly app. Publishes to
+   `home/thermostat` (retained), carrying `mode` and `heating_demand`.
 
 **Status:** all three functions working and tested, including
 persistence across gateway reboots (KVS + device status seeding on

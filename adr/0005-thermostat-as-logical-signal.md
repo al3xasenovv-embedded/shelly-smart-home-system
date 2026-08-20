@@ -1,7 +1,8 @@
 # ADR-0005: Thermostat implemented as logical heating-demand signal
 
 ## Status
-Accepted
+Accepted. Extended by ADR-0006, which adds a cooling mode on top
+of the same logical-signal approach.
 
 ## Context
 Task requirement #3 asks for a thermostat using built-in Shelly
@@ -19,6 +20,9 @@ a "heating demand" boolean, exposed via:
 
 No physical actuator is switched. The signal represents what a real
 heating relay would do, and is ready to drive one if hardware is added.
+
+Since ADR-0006 the same signal also represents cooling demand when the
+thermostat is in cooling mode.
 
 ## Consequences
 - Fully testable and demonstrable logic without additional hardware.

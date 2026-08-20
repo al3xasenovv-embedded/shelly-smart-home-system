@@ -26,6 +26,20 @@ ALL_TOPICS = [
 ]
 
 
+def _thermostat_mode(data: dict) -> str:
+    """Read the thermostat mode, tolerating the pre-cooling payload.
+
+    The gateway used to publish `enabled: bool` (Off/Auto, heating
+    only); it now publishes `mode: "off" | "heating" | "cooling"`.
+    A retained message from before that change can still be sitting
+    on the broker, so both shapes are accepted.
+    """
+    mode = data.get("mode")
+    if mode is not None:
+        return mode
+    return "heating" if data.get("enabled") else "off"
+
+
 def decode(topic: str, payload: bytes) -> Optional[object]:
     """Decode a raw MQTT message into the matching model, or None if
     the topic is unrecognized or the payload is malformed."""
@@ -49,7 +63,7 @@ def decode(topic: str, payload: bytes) -> Optional[object]:
         return HumidityControlState(plug_on=data["plug_on"], ts=data["ts"])
     if topic == TOPIC_THERMOSTAT:
         return ThermostatState(
-            enabled=data["enabled"],
+            mode=_thermostat_mode(data),
             setpoint=data["setpoint"],
             heating_demand=data["heating_demand"],
             current_temp=data.get("current_temp"),

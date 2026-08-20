@@ -36,8 +36,14 @@ def handle_message(topic: str, model: object):
         window.root.after(0, window.update_plug, model.plug_on)
     elif isinstance(model, ThermostatState):
         window.root.after(
-            0, window.update_thermostat, model.enabled, model.setpoint, model.heating_demand
+            0, window.update_thermostat, model.mode, model.setpoint, model.heating_demand
         )
+
+
+def handle_connection_change(connected: bool):
+    if window is None:
+        return
+    window.root.after(0, window.set_connected, connected)
 
 
 def main():
@@ -60,12 +66,12 @@ def main():
         username=config.MQTT_USER,
         password=config.MQTT_PASSWORD,
         on_message=handle_message,
+        on_connection_change=handle_connection_change,
     )
     client.connect()
 
     mqtt_thread = threading.Thread(target=client.loop_forever, daemon=True)
     mqtt_thread.start()
-    window.root.after(800, lambda: window.set_connected(True))
 
     window.run()
     return 0

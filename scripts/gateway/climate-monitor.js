@@ -1,6 +1,9 @@
 // Climate monitoring + automatic humidity control + thermostat
 // (combined into a single script due to the gateway's 3-script limit,
 // see docs/09-troubleshooting.md and adr/0004-*).
+//
+// Thermostat supports three modes: Off / Heating / Cooling, controlled
+// via two mutually-exclusive virtual boolean toggles.
 
 let CONFIG = {
   temperatureComponent: "bthomesensor:207",
@@ -19,7 +22,8 @@ let CONFIG = {
 
   setpointComponentId: 200,      // number:200 — Thermostat Setpoint
   heatingDemandComponentId: 201, // boolean:201 — Heating Demand
-  enabledComponentId: 202,       // boolean:202 — Thermostat Enabled
+  heatingModeComponentId: 202,   // boolean:202 — Thermostat HEATING
+  coolingModeComponentId: 203,   // boolean:203 — Thermostat COOLING
   thermostatDeadband: 0.5,       // °C, hysteresis band
   thermostatMqttTopic: "home/thermostat"
 };
@@ -91,15 +95,20 @@ Timer.set(60000, true, function () {
   }
 });
 
-// --- Thermostat (logical signal, no physical actuator — see ADR-0005) ---
+// --- Thermostat: Off / Heating / Cooling ---
 
 let currentSetpoint = 21;
 let heatingDemand = false;
-let thermostatEnabled = true;
+let heatingModeOn = true;
+let coolingModeOn = false;
 
 function publishThermostat() {
+  let mode = "off";
+  if (heatingModeOn) mode = "heating";
+  else if (coolingModeOn) mode = "cooling";
+
   let payload = JSON.stringify({
-    enabled: thermostatEnabled,
+    mode: mode,
     setpoint: currentSetpoint,
     heating_demand: heatingDemand,
     current_temp: lastTemperature,
@@ -117,35 +126,65 @@ function setHeatingDemand(state) {
 }
 
 function evaluateThermostat() {
-  if (!thermostatEnabled) {
+  if (!heatingModeOn && !coolingModeOn) {
     setHeatingDemand(false);
     return;
   }
   if (lastTemperature === null) return;
+
   let low = currentSetpoint - CONFIG.thermostatDeadband;
   let high = currentSetpoint + CONFIG.thermostatDeadband;
-  if (lastTemperature < low) {
-    setHeatingDemand(true);
-  } else if (lastTemperature > high) {
-    setHeatingDemand(false);
+
+  if (heatingModeOn) {
+    if (lastTemperature < low) {
+      setHeatingDemand(true);
+    } else if (lastTemperature > high) {
+      setHeatingDemand(false);
+    }
+  } else if (coolingModeOn) {
+    if (lastTemperature > high) {
+      setHeatingDemand(true);
+    } else if (lastTemperature < low) {
+      setHeatingDemand(false);
+    }
   }
-  // temperature is within the deadband: keep the current state (hysteresis)
 }
 
-// Listen for setpoint and enabled/mode changes made from the app
+function setHeatingMode(on) {
+  heatingModeOn = on;
+  if (on && coolingModeOn) {
+    coolingModeOn = false;
+    Shelly.call("Boolean.Set", { id: CONFIG.coolingModeComponentId, value: false });
+  }
+  evaluateThermostat();
+  publishThermostat();
+}
+
+function setCoolingMode(on) {
+  coolingModeOn = on;
+  if (on && heatingModeOn) {
+    heatingModeOn = false;
+    Shelly.call("Boolean.Set", { id: CONFIG.heatingModeComponentId, value: false });
+  }
+  evaluateThermostat();
+  publishThermostat();
+}
+
+// --- Status handlers ---
+
 Shelly.addStatusHandler(function (status) {
   if (status.component === "number:" + CONFIG.setpointComponentId) {
     currentSetpoint = status.delta.value;
     print("Setpoint changed to:", currentSetpoint);
     evaluateThermostat();
-  } else if (status.component === "boolean:" + CONFIG.enabledComponentId) {
-    thermostatEnabled = status.delta.value;
-    print("Thermostat enabled changed to:", thermostatEnabled);
-    evaluateThermostat();
+  } else if (status.component === "boolean:" + CONFIG.heatingModeComponentId) {
+    print("Heating mode changed to:", status.delta.value);
+    setHeatingMode(status.delta.value);
+  } else if (status.component === "boolean:" + CONFIG.coolingModeComponentId) {
+    print("Cooling mode changed to:", status.delta.value);
+    setCoolingMode(status.delta.value);
   }
 });
-
-// --- Sensor status handler ---
 
 Shelly.addStatusHandler(function (status) {
   if (status.component === CONFIG.temperatureComponent) {
@@ -162,9 +201,7 @@ Shelly.addStatusHandler(function (status) {
   }
 });
 
-// --- Startup: seed all initial state sequentially (chained), to avoid
-// "Too many calls in progress" errors from firing several async
-// Shelly.call requests in parallel on startup. ---
+// --- Startup: seed all initial state sequentially (chained) ---
 
 function seedClimateValues() {
   Shelly.call("BTHomeSensor.GetStatus", { id: 207 }, function (result, error_code) {
@@ -210,12 +247,19 @@ function seedAll() {
           print("Seeded heating demand:", heatingDemand);
         }
 
-        Shelly.call("Boolean.GetStatus", { id: CONFIG.enabledComponentId }, function (result, error_code) {
+        Shelly.call("Boolean.GetStatus", { id: CONFIG.heatingModeComponentId }, function (result, error_code) {
           if (error_code === 0 && result) {
-            thermostatEnabled = result.value;
-            print("Seeded thermostat enabled:", thermostatEnabled);
+            heatingModeOn = result.value;
+            print("Seeded heating mode:", heatingModeOn);
           }
-          seedClimateValues();
+
+          Shelly.call("Boolean.GetStatus", { id: CONFIG.coolingModeComponentId }, function (result, error_code) {
+            if (error_code === 0 && result) {
+              coolingModeOn = result.value;
+              print("Seeded cooling mode:", coolingModeOn);
+            }
+            seedClimateValues();
+          });
         });
       });
     });

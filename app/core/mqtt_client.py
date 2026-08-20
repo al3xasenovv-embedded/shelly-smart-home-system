@@ -3,7 +3,7 @@ all relevant topics, and forwards decoded messages to a callback.
 """
 
 import logging
-from typing import Callable
+from typing import Callable, Optional
 
 import paho.mqtt.client as mqtt
 
@@ -20,8 +20,10 @@ class MqttClient:
         username: str,
         password: str,
         on_message: Callable[[str, object], None],
+        on_connection_change: Optional[Callable[[bool], None]] = None,
     ):
         self._on_message_callback = on_message
+        self._on_connection_change = on_connection_change
         self._client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         self._client.username_pw_set(username, password)
         self._client.on_connect = self._handle_connect
@@ -44,15 +46,38 @@ class MqttClient:
             for topic in ALL_TOPICS:
                 client.subscribe(topic)
                 logger.info("Subscribed to %s", topic)
+            self._notify_connection(True)
         else:
             logger.error("Connection failed: %s", reason_code)
+            self._notify_connection(False)
 
     def _handle_disconnect(self, client, userdata, flags, reason_code, properties):
         logger.warning("Disconnected from broker: %s", reason_code)
+        self._notify_connection(False)
+
+    def _notify_connection(self, connected: bool):
+        if self._on_connection_change is None:
+            return
+        try:
+            self._on_connection_change(connected)
+        except Exception:
+            logger.exception("Connection-state handler failed")
 
     def _handle_message(self, client, userdata, msg):
-        model = decode(msg.topic, msg.payload)
-        if model is not None:
-            self._on_message_callback(msg.topic, model)
-        else:
+        # paho lets exceptions escape loop_forever(), which would kill the
+        # network thread and silently freeze every further update. A single
+        # malformed or changed payload must not cost us the whole stream.
+        try:
+            model = decode(msg.topic, msg.payload)
+        except Exception:
+            logger.exception("Failed to decode message on %s", msg.topic)
+            return
+
+        if model is None:
             logger.debug("Ignored message on %s (undecodable)", msg.topic)
+            return
+
+        try:
+            self._on_message_callback(msg.topic, model)
+        except Exception:
+            logger.exception("Message handler failed for %s", msg.topic)
