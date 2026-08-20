@@ -25,6 +25,3 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Logs (real ones, not the template)
-logs/*
-!logs/test-log-template.md

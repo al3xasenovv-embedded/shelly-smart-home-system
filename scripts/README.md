@@ -34,25 +34,17 @@ report after the initial contact change.
 
 ## climate-monitor.js
 
-Reads temperature, humidity, and battery level from the BLU H&T ZB
-(components `bthomesensor:207`, `bthomesensor:206`, `bthomesensor:205`)
-and publishes a combined reading to MQTT (`home/climate`, retained).
-
-Seeds all three values from the sensor's current status on script
-start, rather than waiting for the next change — a value that hasn't
-changed since the last report (e.g. a steady temperature while
-humidity fluctuates) would otherwise never trigger the status handler.
-
-**Status:** working, tested — temperature, humidity, and battery all
-populate correctly on script start and update live on sensor changes.
-
-## climate-monitor.js
-
 Combined script (single script due to the gateway's 3-script limit,
 see docs/09-troubleshooting.md and adr/0004-*) handling:
 
 1. **Climate monitoring** — reads temperature, humidity, battery from
-   BLU H&T ZB, publishes to `home/climate` (retained).
+   BLU H&T ZB (components `bthomesensor:207`, `bthomesensor:206`,
+   `bthomesensor:205`), publishes to `home/climate` (retained). Seeds
+   all three values from the sensor's current status on script start,
+   rather than waiting for the next change — a value that hasn't
+   changed since the last report (e.g. a steady temperature while
+   humidity fluctuates) would otherwise never trigger the status
+   handler.
 
 2. **Automatic humidity control** — hysteresis-based control of the
    Shelly Plug S based on humidity readings, with anti-short-cycle

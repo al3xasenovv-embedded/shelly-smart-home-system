@@ -1,19 +1,26 @@
-stateDiagram-v2
-[*] --> Away
+flowchart TD
+Start(["New humidity reading"]) --> CheckState{"Plug currently<br/>on or off?"}
 
-Away --> Home: single_push
-Home --> Away: single_push
+CheckState -- "Off" --> CheckHigh{"humidity >= 60%?"}
+CheckHigh -- Yes --> CheckCooldown1{"180s passed since<br/>last switch?"}
+CheckHigh -- No --> NoChange1["No change"]
 
-note right of Home
-    Published to MQTT:
-    home/presence
-    {"present": true, "ts": ...}
-    Mirrored to boolean:200
-    (visible in Shelly app)
-end note
+CheckState -- "On" --> CheckLow{"humidity <= 55%?"}
+CheckLow -- Yes --> CheckCooldown2{"180s passed since<br/>last switch?"}
+CheckLow -- No --> NoChange2["No change"]
 
-note right of Away
-    Published to MQTT:
-    home/presence
-    {"present": false, "ts": ...}
-end note
+CheckCooldown1 -- Yes --> TurnOn["Switch plug ON<br/>(HTTP RPC to Plug S)"]
+CheckCooldown1 -- No --> Skip1["Skip: too soon<br/>since last switch"]
+
+CheckCooldown2 -- Yes --> TurnOff["Switch plug OFF<br/>(HTTP RPC to Plug S)"]
+CheckCooldown2 -- No --> Skip2["Skip: too soon<br/>since last switch"]
+
+TurnOn --> Publish
+TurnOff --> Publish
+
+Publish["Publish to MQTT: home/humidity-control<br/>Persist state via KVS"] --> End(["Done"])
+
+FailSafe(["Every 60s: check reading age"]) --> Stale{"No reading for<br/>600s AND plug is on?"}
+Stale -- Yes --> ForceOff["Force plug OFF<br/>(stale data fail-safe)"]
+Stale -- No --> NoAction["No action"]
+ForceOff --> Publish
