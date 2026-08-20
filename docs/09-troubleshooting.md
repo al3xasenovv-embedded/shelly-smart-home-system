@@ -11,15 +11,15 @@ set to `true` explicitly.
 
 **Fix:**
 
-\`\`\`bash
+```bash
 curl -X POST -d '{"id":1,"method":"Script.SetConfig","params":{"id":1,"config":{"enable":true}}}' http://<gateway-ip>/rpc
-\`\`\`
+```
 
 Verify with:
 
-\`\`\`bash
+```bash
 curl -X POST -d '{"id":1,"method":"Script.GetConfig","params":{"id":1}}' http://<gateway-ip>/rpc
-\`\`\`
+```
 
 
 ## Script state desyncs from physical device after restart

@@ -1,4 +1,3 @@
-cat > .gitignore <<'EOF'
 # Python
 __pycache__/
 *.py[cod]
@@ -26,7 +25,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Logs (реални, не шаблона)
+# Logs (real ones, not the template)
 logs/*
 !logs/test-log-template.md
-EOF

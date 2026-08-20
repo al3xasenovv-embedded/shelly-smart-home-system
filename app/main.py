@@ -3,8 +3,10 @@ current values in a simple Tkinter window.
 """
 
 import logging
+import sys
 import threading
 
+import config
 from core.mqtt_client import MqttClient
 from core.models import (
     PresenceState,
@@ -16,11 +18,6 @@ from core.models import (
 from ui import MonitorWindow
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-
-MQTT_HOST = "192.168.100.5"
-MQTT_PORT = 1883
-MQTT_USER = "shellyhub"
-MQTT_PASSWORD = "1811"
 
 window: MonitorWindow = None
 
@@ -46,23 +43,33 @@ def handle_message(topic: str, model: object):
 def main():
     global window
 
-    window = MonitorWindow()  # първо прозорецът
+    try:
+        config.validate()
+    except config.ConfigError as exc:
+        print(f"Configuration error: {exc}", file=sys.stderr)
+        return 1
+
+    # The window must exist before the MQTT thread starts, otherwise the
+    # first (retained) messages arrive while `window` is still None and
+    # get silently dropped.
+    window = MonitorWindow()
 
     client = MqttClient(
-        host=MQTT_HOST,
-        port=MQTT_PORT,
-        username=MQTT_USER,
-        password=MQTT_PASSWORD,
+        host=config.MQTT_HOST,
+        port=config.MQTT_PORT,
+        username=config.MQTT_USER,
+        password=config.MQTT_PASSWORD,
         on_message=handle_message,
     )
     client.connect()
 
     mqtt_thread = threading.Thread(target=client.loop_forever, daemon=True)
-    mqtt_thread.start()  # чак сега пускаме MQTT-то
+    mqtt_thread.start()
     window.root.after(800, lambda: window.set_connected(True))
 
     window.run()
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
