@@ -17,3 +17,17 @@ auto-start both persist correctly.
 (`Script.SetConfig`) to auto-start after a reboot. This is not the same
 as pressing "Start" in the web UI, which only affects the current
 session.
+
+## window-state.js
+
+Detects the three states of a single-leaf window (closed / open / tilted)
+by combining two BTHome sensor components from the BLU Door/Window ZB:
+contact state (`bthomesensor:202`) and tilt angle (`bthomesensor:203`).
+
+Publishes to MQTT (`home/window`, retained) and persists the last known
+state via KVS. Uses `Shelly.addStatusHandler` (not `addEventHandler`) —
+these are BTHome sensor status changes, not discrete events.
+
+**Status:** working, tested for all three states, including the
+tilted state which requires waiting for the asynchronous rotation
+report after the initial contact change.
