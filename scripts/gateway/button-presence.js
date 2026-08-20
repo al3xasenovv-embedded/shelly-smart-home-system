@@ -23,6 +23,12 @@ function publishPresence(isHome) {
   });
   MQTT.publish(CONFIG.mqttTopic, payload, 0, true);
   print("Presence published:", payload);
+
+  Shelly.call("Boolean.Set", {id: 200, value: isHome}, function(result, error_code, error_message) {
+    if (error_code !== 0) {
+      print("Boolean.Set failed:", error_message);
+    }
+  });
 }
 
 function togglePresence() {
