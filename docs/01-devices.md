@@ -29,11 +29,14 @@ The current state is exposed as:
 - a virtual boolean component (`boolean:200`, "Home/Away") on the
   gateway, visible directly in the Shelly Smart Control app
 
+The Away transition also drives the notification scenario in
+`docs/11-notifications-and-scenarios.md`.
+
 ### BLU Door/Window ZB
 Reports both contact state (open/closed) and tilt angle. Combined, these
 two signals are used to distinguish three window states: closed, tilted
-(ventilation position), and fully open. See `docs/04-*` for the state
-machine design.
+(ventilation position), and fully open. See `docs/05-window-state.md`
+for the state machine design.
 
 ### BLU H&T ZB
 Provides temperature and humidity readings used by:
@@ -80,6 +83,7 @@ The demand flag keeps the name `heating_demand` in both modes; in
 cooling mode a true value means cooling demand (see `adr/0006-*`).
 
 Published to MQTT on `home/thermostat` (retained).
+
 ### Shelly Plug S Gen3
 Wi-Fi connected smart plug, used as the actuator for the automatic
 humidity control system (e.g. switching a dehumidifier/humidifier on

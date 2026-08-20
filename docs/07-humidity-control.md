@@ -10,6 +10,23 @@ humidity <= 55% → turn plug off
 55% < humidity < 60% → keep current state (hysteresis deadband)
 
 
+## Configuration: hard-coded on purpose
+
+Every parameter above lives as a constant in the `CONFIG` block of
+`scripts/gateway/climate-monitor.js`. Nothing here is editable from
+the Shelly app, and changing a threshold means editing the script and
+re-uploading it to the gateway.
+
+This is deliberate, and it is the opposite of how the thermostat is
+configured — see `adr/0008-two-configuration-approaches.md`. The short
+version: these are protective limits rather than preferences. The
+180-second guard exists to save a compressor and the 600-second
+timeout exists to stop the system acting on stale readings; neither is
+something a user should be able to set to zero from a phone.
+
+Between them, the two subsystems demonstrate both configuration
+techniques the Shelly ecosystem offers.
+
 ## Safety mechanisms
 
 - **Anti-short-cycle protection**: minimum 180 seconds between

@@ -62,15 +62,18 @@ virtual component.
 
 ## Move the IFTTT webhook key out of the script
 
-`button-presence.js` carries the IFTTT Webhooks key inline in the
-request URL. It is a credential and belongs outside the repository, the
-same way the MQTT password was moved into `app/.env`.
+The credential is currently kept out of the repository by committing a
+placeholder in `CONFIG.notifyUrl`, with the real URL living only on the
+gateway. That protects the secret but makes the committed script
+undeployable: uploading it overwrites the working URL, and the
+notification then fails silently until someone pastes it back in the
+script editor.
 
-Storing it in gateway KVS and reading it once at script startup would
-fix this without changing any behaviour: the URL is assembled at call
-time, and a missing key simply disables the notification instead of
-breaking the script. The key should be regenerated in IFTTT if it has
-ever been pushed to a remote.
+Reading the URL from gateway KVS would give both properties at once —
+no secret in the repository, and a file that can be uploaded as-is. The
+script would assemble the URL at call time from a KVS key, and a
+missing key would disable the notification with a log line instead of
+sending a request to a placeholder address.
 
 ## Automated testing
 

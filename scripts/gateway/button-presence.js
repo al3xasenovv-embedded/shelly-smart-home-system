@@ -19,7 +19,7 @@ let CONFIG = {
   kvsKey: "presence_state",
   mqttTopic: "home/presence",
   presenceComponentId: 200, // boolean:200 — Home/Away
-  notifyUrl: "https://maker.ifttt.com/trigger/Left_home/with/key/uFoeMPrvFhDNlbfuFMJcq"
+  notifyUrl: "YOUR_IFTTT_KEY_HERE"
 };
 
 function publishPresence(isHome) {

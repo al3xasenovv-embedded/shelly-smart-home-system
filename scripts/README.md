@@ -20,9 +20,12 @@ message. See `docs/11-notifications-and-scenarios.md` and `adr/0007-*`.
 auto-start both persist correctly. The notification path has not been
 systematically tested yet (see `docs/08-testing-plan.md`).
 
-**Gotcha:** the IFTTT Webhooks key is currently inline in the request
-URL. It is a credential and should move into KVS — see
-`docs/10-future-improvements.md`.
+**Gotcha:** `CONFIG.notifyUrl` is a placeholder in this repository
+(`YOUR_IFTTT_KEY_HERE`) because the real Webhooks URL is a credential.
+Despite the name, the field holds the **full URL**, not just the key.
+Uploading this file to the gateway overwrites the working value and
+silently disables the notification until it is pasted back — see
+`docs/11-notifications-and-scenarios.md`.
 
 **Gotcha:** the script must have `config.enable = true`
 (`Script.SetConfig`) to auto-start after a reboot. This is not the same
@@ -56,6 +59,11 @@ see docs/09-troubleshooting.md and adr/0004-*) handling:
    changed since the last report (e.g. a steady temperature while
    humidity fluctuates) would otherwise never trigger the status
    handler.
+
+The two control loops inside this script are configured differently on
+purpose: the humidity thresholds are constants in `CONFIG`, while the
+thermostat reads its setpoint and mode from virtual components the user
+edits in the Shelly app. See `adr/0008-two-configuration-approaches.md`.
 
 2. **Automatic humidity control** — hysteresis-based control of the
    Shelly Plug S based on humidity readings, with anti-short-cycle

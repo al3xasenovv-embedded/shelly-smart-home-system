@@ -87,12 +87,31 @@ notification can still say which it was.
 The IFTTT event name is `Left_home`. The applet must be listening for
 that exact name.
 
-> **The Webhooks key is currently hard-coded in the request URL in
-> `scripts/gateway/button-presence.js`.** It is a credential and should
-> be handled the way the MQTT password is — kept out of the repository.
-> Storing it in gateway KVS and reading it at script startup would do
-> that without changing any behaviour. See
-> `docs/10-future-improvements.md`.
+### The webhook URL is not in this repository
+
+The Webhooks URL contains the account's Webhooks key, which is a
+credential. The version committed here carries a placeholder instead:
+
+```js
+notifyUrl: "YOUR_IFTTT_KEY_HERE"
+```
+
+The real value exists only on the gateway. Despite the placeholder's
+name, the field holds the **entire URL**, not just the key — the script
+passes it straight to `HTTP.Request` as `url`. Replace it with:
+
+```
+https://maker.ifttt.com/trigger/Left_home/with/key/<your webhooks key>
+```
+
+Your key is under **Webhooks → Documentation** in IFTTT.
+
+> **Re-uploading this script to the gateway overwrites the working
+> URL with the placeholder**, and the notification then fails silently
+> on every Away transition — the script log shows the failed request,
+> nothing else does. Paste the URL back in the gateway's script editor
+> after any upload. Keeping the value in KVS instead would remove this
+> footgun; see `docs/10-future-improvements.md`.
 
 ### The IFTTT applet
 

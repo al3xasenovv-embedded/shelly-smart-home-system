@@ -57,10 +57,14 @@ reads that key at the moment of the transition.
   log.
 - The webhook is fire-and-forget. A successful response means IFTTT
   accepted the request, not that the phone received anything.
-- The IFTTT Webhooks key is a credential, and it currently sits in the
-  request URL inside `button-presence.js`. That is inconsistent with
-  how the MQTT password is handled and should be moved into gateway
-  KVS — see `docs/10-future-improvements.md`.
+- The IFTTT Webhooks URL contains a credential, so the committed script
+  carries a placeholder and the real URL exists only on the gateway.
+  The consequence is that the file in this repository is not
+  deployable as-is: uploading it overwrites the working URL and
+  silently disables the notification until the value is pasted back.
+  Reading the URL from gateway KVS would keep the secret out of the
+  repository *and* keep the file deployable — see
+  `docs/10-future-improvements.md`.
 - The applet itself is not under version control. The repository can
   describe it but cannot reproduce it.
 - KVS becomes a load-bearing interface between two scripts, not just a

@@ -30,6 +30,23 @@ Off mode — demand is forced off regardless of temperature. The
 setpoint value is preserved, not reset, so switching back into Heating
 or Cooling resumes with the same target.
 
+## Configuration: user input at runtime
+
+Unlike the humidity control, whose thresholds are constants in the
+script, the thermostat is configured by the user while it runs. The
+setpoint and the mode are virtual components on the gateway, editable
+from the Shelly app — no script edit, no re-upload, no restart.
+
+The two subsystems were built this way on purpose, so the project
+shows both configuration techniques the ecosystem offers. The reasoning
+for which subsystem got which is in
+`adr/0008-two-configuration-approaches.md`.
+
+The flexibility is not free: it costs four virtual components created
+by hand, startup seeding to read their current values, and status
+handlers to react when they change. The humidity control needs none of
+that.
+
 ## Virtual components
 
 - `number:200` — Setpoint temperature, editable from the Shelly app

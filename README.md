@@ -138,6 +138,13 @@ connects late immediately receives the current state.
 
 ### Control logic
 
+The two closed loops are configured differently on purpose. The
+humidity thresholds below are **hard-coded constants** in
+[climate-monitor.js](scripts/gateway/climate-monitor.js); the
+thermostat setpoint and mode are **virtual components the user edits
+in the Shelly app** at runtime. One subsystem demonstrates each
+approach — see [ADR-0008](adr/0008-two-configuration-approaches.md).
+
 | Behavior | Thresholds |
 |---|---|
 | Humidity control | Plug on at 60% RH and above, off at 55% RH and below (hysteresis) |
@@ -258,6 +265,7 @@ Add images to images/ and reference them here. Suggested set:
 | [0005](adr/0005-thermostat-as-logical-signal.md) | Thermostat implemented as a logical heating-demand signal |
 | [0006](adr/0006-thermostat-cooling-mode.md) | Cooling mode via two mutually-exclusive mode toggles |
 | [0007](adr/0007-ifttt-notification-in-cloud.md) | Phone notifications via IFTTT, outside the hub |
+| [0008](adr/0008-two-configuration-approaches.md) | Hard-coded config for humidity control, user input for the thermostat |
 
 ## Known limitations
 
@@ -276,6 +284,8 @@ Add images to images/ and reference them here. Suggested set:
   failed webhook is logged on the gateway and never retried, so the
   notification is simply lost — see
   [docs/11-notifications-and-scenarios.md](docs/11-notifications-and-scenarios.md).
-- The IFTTT Webhooks key is currently hard-coded in
-  [button-presence.js](scripts/gateway/button-presence.js) instead of
-  being kept out of the repository like the MQTT password.
+- The IFTTT webhook URL is a credential, so the committed
+  [button-presence.js](scripts/gateway/button-presence.js) carries a
+  placeholder and the real URL lives only on the gateway. Uploading the
+  file to the device therefore overwrites the working URL — see
+  [docs/11-notifications-and-scenarios.md](docs/11-notifications-and-scenarios.md).

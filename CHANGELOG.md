@@ -5,6 +5,10 @@ Times are local (`git log --date=format:'%Y-%m-%d %H:%M'`).
 
 | Date | Time | Commit | Hash | Summary |
 |---|---|---|---|---|
+| 2026-08-20 | 23:23 | FIX: Notification when away->open window | `7a70f37` | Away-transition webhook documented: ADR-0007, `docs/11-notifications-and-scenarios.md`, notification diagram, and test rows |
+| 2026-08-20 | 23:05 | FIX: Added cooling part of termostar logic | `9fc1449` | Thermostat gains Off/Heating/Cooling; `enabled` replaced by `mode` in the payload; monitoring app decoder, models and UI updated; ADR-0006 |
+| 2026-08-20 | 18:47 | README fix | `67206d9` | Root README rewritten against the real tree; `app/core/storage.py` and unused `MqttClient` methods removed |
+| 2026-08-20 | 18:30 | Clean up | `b9df294` | Empty `configs/` and `logs/` placeholders dropped; `scripts/README.md` de-duplicated; humidity diagram expanded |
 | 2026-08-20 | 18:01 | Diagrams update | `428100c` | Filled in all five Mermaid diagrams (architecture, humidity control, presence, thermostat, window state) |
 | 2026-08-20 | 17:49 | Docu update - remove and restructure | `da3ccd8` | Reorganised `docs/` and `adr/` to match the shipped design; new ADR-0001/0003/0005, docs split into presence / window-state / thermostat / humidity chapters |
 | 2026-08-20 | 16:55 | Fix readme | `5505313` | README corrections — requirements status table and links |
