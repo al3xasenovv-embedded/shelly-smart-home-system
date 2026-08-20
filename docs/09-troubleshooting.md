@@ -20,3 +20,20 @@ Verify with:
 \`\`\`bash
 curl -X POST -d '{"id":1,"method":"Script.GetConfig","params":{"id":1}}' http://<gateway-ip>/rpc
 \`\`\`
+
+
+## Script state desyncs from physical device after restart
+
+**Symptom:** humidity control logic doesn't trigger, even though the
+humidity clearly crosses the configured threshold.
+
+**Cause:** the script tracked the plug's on/off state in an in-memory
+variable (`plugIsOn`), initialized to `false` on every script restart.
+If the plug was physically on (e.g. from a previous test) but the
+script restarted, the variable no longer matched reality — both the
+"turn on" and "turn off" conditions failed silently, since each checks
+the in-memory flag before acting.
+
+**Fix:** seed the in-memory state from the actual device status via
+`Switch.GetStatus` on script start, not just from KVS or an assumed
+default.
