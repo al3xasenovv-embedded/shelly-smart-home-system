@@ -54,5 +54,4 @@ Working: live MQTT consumption, decoding, and a dark-themed window
 showing current values for all five topics.
 
 The UI intentionally shows only *current* values — no history or
-graphs. `core/storage.py` is an empty placeholder kept for a possible
-future SQLite history layer; nothing imports it today.
+graphs.

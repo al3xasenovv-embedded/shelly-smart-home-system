@@ -48,13 +48,13 @@ All testing performed so far was manual and interactive (see
 - Unit tests for the classification/hysteresis logic (extracted into
   testable pure functions where possible)
 - Integration tests using a mock MQTT broker for the monitoring app's
-  decoder and storage layers
+  decoder layer
 
 ## Monitoring app enhancements
 
 - Historical graphs (temperature/humidity over time) — deliberately
-  out of scope for v1; `core/storage.py` (SQLite) exists but is not
-  fully wired into the current UI, which shows live values only.
+  out of scope for v1; the UI shows live values only. Adding them
+  would require a persistence layer, which the app does not have.
 - Real MQTT connection-state tracking in the UI, replacing the current
   fixed-delay `after(800, ...)` approximation.
 - Manual controls from the app (e.g. override the humidity control

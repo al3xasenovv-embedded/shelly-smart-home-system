@@ -38,12 +38,6 @@ class MqttClient:
     def loop_forever(self):
         self._client.loop_forever()
 
-    def loop_start(self):
-        self._client.loop_start()
-
-    def loop_stop(self):
-        self._client.loop_stop()
-
     def _handle_connect(self, client, userdata, flags, reason_code, properties):
         if reason_code == 0:
             logger.info("Connected to broker.")
