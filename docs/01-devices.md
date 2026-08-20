@@ -23,6 +23,11 @@ Used as a manual presence token. A single press toggles the system's
 "home / away" state, handled by a script running on the gateway
 (see `scripts/gateway/` and `adr/0002-use-button-as-presence-token.md`).
 
+The current state is exposed as:
+- MQTT topic `home/presence` (retained)
+- a virtual boolean component (`boolean:200`, "Home/Away") on the
+  gateway, visible directly in the Shelly Smart Control app
+
 ### BLU Door/Window ZB
 Reports both contact state (open/closed) and tilt angle. Combined, these
 two signals are used to distinguish three window states: closed, tilted
