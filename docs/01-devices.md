@@ -7,8 +7,9 @@
 | BLU Gateway Gen3 | S3GW-1DBT001 | `shellyblugwg3-b81f3f5ffe00` | Wi-Fi + BLE | Hub / business logic |
 | BLU Button Tough 1 ZB | — | `bthomedevice:200` | BLE via gateway | Presence detection |
 | BLU Door/Window ZB | — | TBD | BLE via gateway | Window: 3-state detection |
-| BLU H&T ZB | — | TBD | BLE via gateway | Temperature + humidity monitoring |
+| BLU H&T ZB | — | `bthomedevice:202` | BLE via gateway | Temperature + humidity monitoring |
 | Shelly Plug S Gen3 | — | TBD | Wi-Fi | Humidity control (actuator) |
+
 
 ## Roles
 
@@ -39,6 +40,14 @@ Provides temperature and humidity readings used by:
 - the thermostat logic (temperature)
 - the automatic humidity control system (humidity), together with the
   Shelly Plug S
+
+Exposed via three BTHome sensor components:
+- `bthomesensor:207` — temperature (°C)
+- `bthomesensor:206` — humidity (%)
+- `bthomesensor:205` — battery (%)
+
+Published to MQTT on `home/climate` (retained), see
+`scripts/gateway/climate-monitor.js`.
 
 ### Shelly Plug S Gen3
 Wi-Fi connected smart plug, used as the actuator for the automatic

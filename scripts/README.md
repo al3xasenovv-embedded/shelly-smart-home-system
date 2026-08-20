@@ -31,3 +31,17 @@ these are BTHome sensor status changes, not discrete events.
 **Status:** working, tested for all three states, including the
 tilted state which requires waiting for the asynchronous rotation
 report after the initial contact change.
+
+## climate-monitor.js
+
+Reads temperature, humidity, and battery level from the BLU H&T ZB
+(components `bthomesensor:207`, `bthomesensor:206`, `bthomesensor:205`)
+and publishes a combined reading to MQTT (`home/climate`, retained).
+
+Seeds all three values from the sensor's current status on script
+start, rather than waiting for the next change — a value that hasn't
+changed since the last report (e.g. a steady temperature while
+humidity fluctuates) would otherwise never trigger the status handler.
+
+**Status:** working, tested — temperature, humidity, and battery all
+populate correctly on script start and update live on sensor changes.
