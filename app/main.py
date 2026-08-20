@@ -59,6 +59,7 @@ def main():
 
     mqtt_thread = threading.Thread(target=client.loop_forever, daemon=True)
     mqtt_thread.start()  # чак сега пускаме MQTT-то
+    window.root.after(800, lambda: window.set_connected(True))
 
     window.run()
 
