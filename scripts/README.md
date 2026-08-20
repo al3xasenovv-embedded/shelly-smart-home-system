@@ -45,3 +45,26 @@ humidity fluctuates) would otherwise never trigger the status handler.
 
 **Status:** working, tested — temperature, humidity, and battery all
 populate correctly on script start and update live on sensor changes.
+
+## climate-monitor.js
+
+Combined script (single script due to the gateway's 3-script limit,
+see docs/09-troubleshooting.md and adr/0004-*) handling:
+
+1. **Climate monitoring** — reads temperature, humidity, battery from
+   BLU H&T ZB, publishes to `home/climate` (retained).
+
+2. **Automatic humidity control** — hysteresis-based control of the
+   Shelly Plug S based on humidity readings, with anti-short-cycle
+   protection and a stale-data fail-safe. Publishes to
+   `home/humidity-control` (retained).
+
+3. **Thermostat** — hysteresis-based heating-demand logic (logical
+   signal only, no physical actuator — see `adr/0005-*`). Setpoint and
+   Off/Auto mode are controlled via virtual components
+   (`number:200`, `boolean:202`), editable from the Shelly app.
+   Publishes to `home/thermostat` (retained).
+
+**Status:** all three functions working and tested, including
+persistence across gateway reboots (KVS + device status seeding on
+startup to avoid state desync).

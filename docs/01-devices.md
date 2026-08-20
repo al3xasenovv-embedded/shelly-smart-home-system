@@ -49,6 +49,27 @@ Exposed via three BTHome sensor components:
 Published to MQTT on `home/climate` (retained), see
 `scripts/gateway/climate-monitor.js`.
 
+### Thermostat (logical signal)
+
+Implemented as hysteresis-based logic in
+`scripts/gateway/climate-monitor.js` (see `adr/0005-*` — no physical
+heating actuator is available in this deployment; Shelly Plug S is
+already allocated to humidity control).
+
+Exposed via three virtual components on the gateway:
+- `number:200` — Setpoint temperature, editable from the Shelly app
+- `boolean:201` — Heating Demand, read-only indicator
+- `boolean:202` — Thermostat Enabled, Off/Auto toggle
+
+Behavior:
+- Auto mode: heating demand turns on when temperature drops below
+  `setpoint - 0.5°C`, and off above `setpoint + 0.5°C` (hysteresis
+  deadband, prevents rapid toggling).
+- Off mode: heating demand is forced off regardless of temperature.
+  The setpoint value is preserved (not reset) when switching back to
+  Auto.
+
+Published to MQTT on `home/thermostat` (retained).
 ### Shelly Plug S Gen3
 Wi-Fi connected smart plug, used as the actuator for the automatic
 humidity control system (e.g. switching a dehumidifier/humidifier on
