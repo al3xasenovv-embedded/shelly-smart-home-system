@@ -70,6 +70,22 @@ including edge cases discovered and verified during development.
 | Thermostat card labels cooling demand as cooling, not heating | ✅ Verified for all three modes |
 | Live end-to-end run against the gateway after the cooling change | ⬜ Not yet tested |
 
+## IFTTT notification scenario
+
+| Test | Result |
+|---|---|
+| Away transition with a window open sends the notification | ⬜ Not yet recorded |
+| Away transition with all windows closed sends nothing | ⬜ Not yet recorded |
+| Home transition never notifies, regardless of window state | ⬜ Not yet recorded |
+| Tilted window also notifies, and arrives as `value1: "tilted"` | ⬜ Not yet recorded |
+| Away transition with `window_state` never set skips silently | ⬜ Not yet recorded |
+| Behaviour when the gateway has no internet access | ⬜ Not yet recorded — the request is expected to fail and be logged, with no retry |
+
+See `docs/11-notifications-and-scenarios.md`. The condition is testable
+on the gateway (the script console prints which branch was taken), but
+delivery ends in an IFTTT account, so the results above have to be
+recorded by hand.
+
 ## Known gaps / not tested
 
 - No automated test suite (unit tests) — all testing was manual,

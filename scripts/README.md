@@ -10,8 +10,19 @@ Listens for `single_push` events from the BLU Button
 state, stored via KVS on the gateway. Publishes the state to MQTT
 (`home/presence`, retained) on every toggle.
 
+On the transition to Away it also reads `window_state` from KVS (written
+by `window-state.js`) and POSTs to an IFTTT Webhooks endpoint if the
+window is not closed, which produces a push notification. The condition
+is evaluated here, on the hub — the IFTTT applet only delivers the
+message. See `docs/11-notifications-and-scenarios.md` and `adr/0007-*`.
+
 **Status:** working, tested across gateway reboots — state and script
-auto-start both persist correctly.
+auto-start both persist correctly. The notification path has not been
+systematically tested yet (see `docs/08-testing-plan.md`).
+
+**Gotcha:** the IFTTT Webhooks key is currently inline in the request
+URL. It is a credential and should move into KVS — see
+`docs/10-future-improvements.md`.
 
 **Gotcha:** the script must have `config.enable = true`
 (`Script.SetConfig`) to auto-start after a reboot. This is not the same

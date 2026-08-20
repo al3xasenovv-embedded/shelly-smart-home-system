@@ -43,6 +43,17 @@ Published to MQTT topic `home/window` (retained):
 State is persisted via KVS (key `window_state`), surviving gateway
 reboots.
 
+The KVS value is not just persistence — it is also how
+`button-presence.js` learns the window state, since gateway scripts
+cannot share variables. The Away notification scenario reads it at the
+moment of the transition (see
+`docs/11-notifications-and-scenarios.md`). Renaming the key would
+silently break that scenario.
+
+The derived state is not mirrored to a virtual component, so it is not
+visible in the Shelly app the way presence is — see
+`docs/10-future-improvements.md`.
+
 ## Reference
 
 [Shelly BLU Door/Window ZB — Technical Documentation](https://shelly-api-docs.shelly.cloud/docs-ble/Devices/BLU_ZB/dw_ZB)

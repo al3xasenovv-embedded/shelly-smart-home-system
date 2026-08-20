@@ -6,6 +6,10 @@
 // Component id "bthomedevice:200" corresponds to the paired BLU Button
 // (see docs/01-devices.md).
 //
+// On transition to "away", checks the current window state (written
+// to KVS by window-state.js) and triggers an IFTTT webhook if the
+// window is not closed, resulting in a push notification.
+//
 // IMPORTANT: this script must be configured with config.enable = true
 // (Script.SetConfig) to auto-start after a gateway reboot — the "Start"
 // button in the web UI alone only starts it for the current session.
@@ -13,7 +17,9 @@
 let CONFIG = {
   buttonComponent: "bthomedevice:200",
   kvsKey: "presence_state",
-  mqttTopic: "home/presence"
+  mqttTopic: "home/presence",
+  presenceComponentId: 200, // boolean:200 — Home/Away
+  notifyUrl: "https://maker.ifttt.com/trigger/Left_home/with/key/uFoeMPrvFhDNlbfuFMJcq"
 };
 
 function publishPresence(isHome) {
@@ -24,9 +30,30 @@ function publishPresence(isHome) {
   MQTT.publish(CONFIG.mqttTopic, payload, 0, true);
   print("Presence published:", payload);
 
-  Shelly.call("Boolean.Set", {id: 200, value: isHome}, function(result, error_code, error_message) {
+  Shelly.call("Boolean.Set", { id: CONFIG.presenceComponentId, value: isHome }, function (result, error_code, error_message) {
     if (error_code !== 0) {
       print("Boolean.Set failed:", error_message);
+    }
+  });
+}
+
+function checkWindowAndNotify() {
+  Shelly.call("KVS.Get", { key: "window_state" }, function (result, error_code) {
+    if (error_code === 0 && result && result.value !== "closed") {
+      Shelly.call("HTTP.Request", {
+        method: "POST",
+        url: CONFIG.notifyUrl,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ value1: result.value })
+      }, function (res, err) {
+        if (err !== 0) {
+          print("IFTTT trigger failed, error:", err);
+        } else {
+          print("IFTTT triggered, window state:", result.value);
+        }
+      });
+    } else {
+      print("Window is closed, no notification needed.");
     }
   });
 }
@@ -43,6 +70,10 @@ function togglePresence() {
       value: newState ? "true" : "false"
     });
     publishPresence(newState);
+
+    if (newState === false) {
+      checkWindowAndNotify();
+    }
   });
 }
 

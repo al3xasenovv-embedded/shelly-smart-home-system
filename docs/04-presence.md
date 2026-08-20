@@ -23,6 +23,9 @@ the BLU Gateway Gen3.
 
 ## Behavior notes
 
+- On the Away transition the script reads the window state from KVS
+  and fires an IFTTT webhook if the window is not closed — see
+  `docs/11-notifications-and-scenarios.md` and `adr/0007-*`.
 - Only `single_push` events trigger a toggle. Double/triple/long press
   are not currently used for presence (available for future use).
 - On gateway reboot, the script must have `config.enable = true` to

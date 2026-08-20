@@ -48,6 +48,30 @@ a misnomer in cooling mode, kept only for compatibility. Driving two
 separate actuators is the natural moment to split it into explicit
 heating and cooling outputs.
 
+## Mirror the window state to a virtual component
+
+`window-state.js` publishes its three-state classification to MQTT and
+KVS, but never mirrors it to a virtual component the way
+`button-presence.js` mirrors presence to `boolean:200`. The state is
+therefore invisible in the Shelly app, which shows only the raw contact
+and rotation sensors.
+
+Mirroring it would need either a boolean per state or a `number:`
+component holding an encoded state, since the gateway has no enum-style
+virtual component.
+
+## Move the IFTTT webhook key out of the script
+
+`button-presence.js` carries the IFTTT Webhooks key inline in the
+request URL. It is a credential and belongs outside the repository, the
+same way the MQTT password was moved into `app/.env`.
+
+Storing it in gateway KVS and reading it once at script startup would
+fix this without changing any behaviour: the URL is assembled at call
+time, and a missing key simply disables the notification instead of
+breaking the script. The key should be regenerated in IFTTT if it has
+ever been pushed to a remote.
+
 ## Automated testing
 
 All testing performed so far was manual and interactive (see

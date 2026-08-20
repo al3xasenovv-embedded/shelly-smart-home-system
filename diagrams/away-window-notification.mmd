@@ -1,0 +1,23 @@
+flowchart TD
+Press(["BLU Button pressed<br/>(single_push)"]) --> Toggle["button-presence.js<br/>togglePresence()"]
+
+Toggle --> Publish["Publish home/presence (retained)<br/>Set boolean:200 Home/Away"]
+Publish --> WasAway{"New state<br/>is Away?"}
+
+WasAway -- "No (Home)" --> Done1(["Nothing further"])
+WasAway -- Yes --> ReadKvs["checkWindowAndNotify()<br/>KVS.Get window_state"]
+
+ReadKvs --> Known{"Key present?"}
+Known -- "No — never classified" --> Silent(["Stay silent"])
+Known -- Yes --> State{"window_state"}
+
+State -- "closed" --> Silent
+State -- "open / tilted" --> Post["HTTP.Request POST<br/>maker.ifttt.com/trigger/Left_home<br/>body: value1 = window state"]
+
+Post --> Result{"Request<br/>succeeded?"}
+Result -- No --> Log(["Log the failure<br/>in the script console"])
+Result -- Yes --> Applet["IFTTT applet<br/>'if webhook received'"]
+Applet --> Notify(["Push notification<br/>on the phone"])
+
+WindowScript["window-state.js<br/>classifies closed / tilted / open"] --> Kvs[("KVS<br/>window_state")]
+Kvs --> ReadKvs

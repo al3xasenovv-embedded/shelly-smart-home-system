@@ -98,6 +98,17 @@ thermostat live in one combined script rather than three
 
 Details and gotchas: [scripts/README.md](scripts/README.md).
 
+### Scenarios
+
+Leaving home while a window is open sends a push notification. The
+condition is evaluated on the gateway — [button-presence.js](scripts/gateway/button-presence.js)
+reads the window classification that [window-state.js](scripts/gateway/window-state.js)
+persists in KVS, and calls an IFTTT webhook only when the notification
+is warranted. The IFTTT applet holds no logic; it just delivers the
+message to a phone that is no longer on the LAN. See
+[docs/11-notifications-and-scenarios.md](docs/11-notifications-and-scenarios.md)
+and [ADR-0007](adr/0007-ifttt-notification-in-cloud.md).
+
 ## Diagrams
 
 Mermaid sources live in [diagrams/](diagrams/). The architecture diagram
@@ -110,6 +121,7 @@ above is the rendered version of `architecture.mmd`.
 | [window-state-machine.mmd](diagrams/window-state-machine.mmd) | Closed / Tilted / Open transitions, including the asynchronous arrival of contact and rotation |
 | [thermostat-logic.mmd](diagrams/thermostat-logic.mmd) | Mode selection (Off / Heating / Cooling), hysteresis deadband, and the resulting demand decision |
 | [humidity-control-logic.mmd](diagrams/humidity-control-logic.mmd) | Hysteresis thresholds, anti-short-cycle cooldown, and the stale-data fail-safe |
+| [away-window-notification.mmd](diagrams/away-window-notification.mmd) | The Away notification scenario: the KVS window check on the hub, and the webhook out to IFTTT |
 
 ## MQTT topics
 
@@ -233,6 +245,7 @@ Add images to images/ and reference them here. Suggested set:
 | [08-testing-plan.md](docs/08-testing-plan.md) | Test plan and recorded results |
 | [09-troubleshooting.md](docs/09-troubleshooting.md) | Problems encountered and their fixes |
 | [10-future-improvements.md](docs/10-future-improvements.md) | Out-of-scope ideas and known rough edges |
+| [11-notifications-and-scenarios.md](docs/11-notifications-and-scenarios.md) | Cross-device scenarios and the IFTTT notification |
 
 ### Architecture decision records
 
@@ -244,6 +257,7 @@ Add images to images/ and reference them here. Suggested set:
 | [0004](adr/0004-consolidate-climate-scripts.md) | Climate, humidity control, and thermostat consolidated into one script |
 | [0005](adr/0005-thermostat-as-logical-signal.md) | Thermostat implemented as a logical heating-demand signal |
 | [0006](adr/0006-thermostat-cooling-mode.md) | Cooling mode via two mutually-exclusive mode toggles |
+| [0007](adr/0007-ifttt-notification-in-cloud.md) | Phone notifications via IFTTT, outside the hub |
 
 ## Known limitations
 
@@ -258,3 +272,10 @@ Add images to images/ and reference them here. Suggested set:
 - The setpoint slider in the Shelly app may report "Failed to apply
   setting" while the value is in fact applied correctly — an app UI
   quirk with virtual components, not a real fault.
+- The Away notification depends on internet access and on IFTTT. A
+  failed webhook is logged on the gateway and never retried, so the
+  notification is simply lost — see
+  [docs/11-notifications-and-scenarios.md](docs/11-notifications-and-scenarios.md).
+- The IFTTT Webhooks key is currently hard-coded in
+  [button-presence.js](scripts/gateway/button-presence.js) instead of
+  being kept out of the repository like the MQTT password.
