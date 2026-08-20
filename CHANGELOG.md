@@ -5,6 +5,7 @@ Times are local (`git log --date=format:'%Y-%m-%d %H:%M'`).
 
 | Date | Time | Commit | Hash | Summary |
 |---|---|---|---|---|
+| 2026-08-21 | 00:22 | FIX: IFTTT webhook credential | `6ccd77e` | Webhook URL replaced by a placeholder, real value kept on the gateway; ADR-0008 on the two configuration approaches; hard-coded vs user-input contrast documented across the docs |
 | 2026-08-20 | 23:23 | FIX: Notification when away->open window | `7a70f37` | Away-transition webhook documented: ADR-0007, `docs/11-notifications-and-scenarios.md`, notification diagram, and test rows |
 | 2026-08-20 | 23:05 | FIX: Added cooling part of termostar logic | `9fc1449` | Thermostat gains Off/Heating/Cooling; `enabled` replaced by `mode` in the payload; monitoring app decoder, models and UI updated; ADR-0006 |
 | 2026-08-20 | 18:47 | README fix | `67206d9` | Root README rewritten against the real tree; `app/core/storage.py` and unused `MqttClient` methods removed |

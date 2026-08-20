@@ -33,11 +33,11 @@ including edge cases discovered and verified during development.
 | Setpoint change from the app updates behavior live | ✅ Verified via direct RPC (`Number.Set`) — app UI itself shows a "Failed to apply setting" error, but the underlying value and script behavior are correct (see `docs/09-troubleshooting.md`) |
 | Off mode (both toggles off) forces demand off | ✅ Verified before the cooling change, when Off was a single `Thermostat Enabled` toggle |
 | Setpoint is preserved (not reset) when leaving Off | ✅ By design, not implemented as an automatic reset |
-| Cooling mode: temperature above setpoint + deadband → demand ON | ⬜ Not yet tested |
-| Cooling mode: temperature below setpoint - deadband → demand OFF | ⬜ Not yet tested |
-| HEATING and COOLING toggles are mutually exclusive in the app | ⬜ Not yet tested |
-| `boolean:203` exists and is seeded correctly on script start | ⬜ Not yet tested |
-| Mode survives a gateway reboot (seeded from component status) | ⬜ Not yet tested |
+| Cooling mode: temperature above setpoint + deadband → demand ON | ✅ |
+| Cooling mode: temperature below setpoint - deadband → demand OFF | ✅ |
+| HEATING and COOLING toggles are mutually exclusive in the app | ✅ Verified in the Shelly app — switching one on visibly switches the other off |
+| `boolean:203` exists and is seeded correctly on script start | ✅ |
+| Mode survives a gateway reboot (seeded from component status) | ✅ |
 
 ## Automatic humidity control
 
@@ -68,23 +68,24 @@ including edge cases discovered and verified during development.
 | Legacy `enabled` payload still decodes (stale retained message) | ✅ Decoded as heating/off by `_thermostat_mode()` |
 | Connection indicator reflects real broker state | ✅ Driven by the paho connect/disconnect callbacks, no longer a fixed timer |
 | Thermostat card labels cooling demand as cooling, not heating | ✅ Verified for all three modes |
-| Live end-to-end run against the gateway after the cooling change | ⬜ Not yet tested |
+| Live end-to-end run against the gateway after the cooling change | ✅ |
 
 ## IFTTT notification scenario
 
 | Test | Result |
 |---|---|
-| Away transition with a window open sends the notification | ⬜ Not yet recorded |
-| Away transition with all windows closed sends nothing | ⬜ Not yet recorded |
-| Home transition never notifies, regardless of window state | ⬜ Not yet recorded |
+| Away transition with a window open sends the notification | ✅ Notification received on the phone |
+| Away transition with all windows closed sends nothing | ✅ |
+| Home transition never notifies, regardless of window state | ✅ |
 | Tilted window also notifies, and arrives as `value1: "tilted"` | ⬜ Not yet recorded |
 | Away transition with `window_state` never set skips silently | ⬜ Not yet recorded |
 | Behaviour when the gateway has no internet access | ⬜ Not yet recorded — the request is expected to fail and be logged, with no retry |
 
-See `docs/11-notifications-and-scenarios.md`. The condition is testable
-on the gateway (the script console prints which branch was taken), but
-delivery ends in an IFTTT account, so the results above have to be
-recorded by hand.
+See `docs/11-notifications-and-scenarios.md`. The three main paths were
+exercised on the real system. The remaining rows are edge cases that
+need the system put into an unusual state on purpose — a window left
+tilted at the moment of leaving, a gateway whose `window_state` key has
+never been written, and a gateway cut off from the internet.
 
 ## Known gaps / not tested
 
@@ -94,3 +95,7 @@ recorded by hand.
 - No load/stress testing (e.g. rapid MQTT message bursts).
 - No test of full system behavior after a router restart / device IP
   change (see `docs/10-future-improvements.md`).
+- Three notification edge cases remain open, marked as unrecorded in
+  the table above: a tilted window at the moment of leaving, an Away
+  transition before `window_state` has ever been written, and the
+  gateway without internet access.

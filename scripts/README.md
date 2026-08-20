@@ -17,8 +17,9 @@ is evaluated here, on the hub — the IFTTT applet only delivers the
 message. See `docs/11-notifications-and-scenarios.md` and `adr/0007-*`.
 
 **Status:** working, tested across gateway reboots — state and script
-auto-start both persist correctly. The notification path has not been
-systematically tested yet (see `docs/08-testing-plan.md`).
+auto-start both persist correctly. The notification path is verified
+for its three main cases; three edge cases remain open (see
+`docs/08-testing-plan.md`).
 
 **Gotcha:** `CONFIG.notifyUrl` is a placeholder in this repository
 (`YOUR_IFTTT_KEY_HERE`) because the real Webhooks URL is a credential.
