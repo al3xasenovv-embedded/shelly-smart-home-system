@@ -1,0 +1,31 @@
+flowchart TB
+subgraph BLE["BLE Sensors (paired to gateway)"]
+Button["BLU Button Tough 1 ZB<br/>bthomedevice:200"]
+DoorWindow["BLU Door/Window ZB<br/>bthomedevice:201"]
+HT["BLU H&T ZB<br/>bthomedevice:202"]
+end
+
+subgraph Gateway["BLU Gateway Gen3 (hub)"]
+    S1["button-presence.js"]
+    S2["window-state.js"]
+    S3["climate-monitor.js<br/>(climate + humidity + thermostat)"]
+end
+
+Broker["Mosquitto MQTT Broker<br/>192.168.100.5:1883"]
+
+Plug["Shelly Plug S Gen3<br/>192.168.100.35<br/>(direct Wi-Fi)"]
+
+App["Monitoring App<br/>(Python, read-only)"]
+
+Button -- BLE --> S1
+DoorWindow -- BLE --> S2
+HT -- BLE --> S3
+
+S1 -- "home/presence" --> Broker
+S2 -- "home/window" --> Broker
+S3 -- "home/climate, home/thermostat" --> Broker
+S3 -- "home/humidity-control" --> Broker
+S3 -- "HTTP RPC Switch.Set/GetStatus" --> Plug
+Plug -- MQTT --> Broker
+
+Broker -- "subscribe (all topics)" --> App

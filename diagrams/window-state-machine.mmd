@@ -1,0 +1,28 @@
+stateDiagram-v2
+[*] --> Closed
+
+Closed --> Open: contact = true, rotation = 0
+Closed --> Tilted: contact = true, rotation != 0
+
+Open --> Closed: contact = false
+Open --> Tilted: rotation status update, rotation != 0
+
+Tilted --> Closed: contact = false
+Tilted --> Open: rotation status update, rotation = 0
+
+note right of Tilted
+    contact and rotation arrive
+    asynchronously (rotation ~2s
+    after contact, while the
+    accelerometer settles).
+    State is re-evaluated on
+    every status change from
+    either sensor.
+end note
+
+note left of Closed
+    Published to MQTT:
+    home/window
+    {"state": "...", "ts": ...}
+    Persisted via KVS
+end note

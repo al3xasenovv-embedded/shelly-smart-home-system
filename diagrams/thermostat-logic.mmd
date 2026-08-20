@@ -1,0 +1,17 @@
+flowchart TD
+Start(["New temperature reading<br/>or setpoint/enabled change"]) --> CheckEnabled{"Thermostat<br/>Enabled?"}
+
+CheckEnabled -- "No (Off)" --> ForceOff["Force heating_demand = false"]
+ForceOff --> Publish
+
+CheckEnabled -- "Yes (Auto)" --> CheckTemp{"Compare temperature<br/>to setpoint ± 0.5°C"}
+
+CheckTemp -- "temp < setpoint - 0.5" --> TurnOn["heating_demand = true"]
+CheckTemp -- "temp > setpoint + 0.5" --> TurnOff["heating_demand = false"]
+CheckTemp -- "within deadband" --> Keep["Keep current heating_demand<br/>(hysteresis, no change)"]
+
+TurnOn --> Publish
+TurnOff --> Publish
+Keep --> Publish
+
+Publish["Publish to MQTT: home/thermostat<br/>Update boolean:201 (Heating Demand)"] --> End(["Done"])

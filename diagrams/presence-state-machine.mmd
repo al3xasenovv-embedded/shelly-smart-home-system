@@ -1,0 +1,19 @@
+stateDiagram-v2
+[*] --> Away
+
+Away --> Home: single_push
+Home --> Away: single_push
+
+note right of Home
+    Published to MQTT:
+    home/presence
+    {"present": true, "ts": ...}
+    Mirrored to boolean:200
+    (visible in Shelly app)
+end note
+
+note right of Away
+    Published to MQTT:
+    home/presence
+    {"present": false, "ts": ...}
+end note
