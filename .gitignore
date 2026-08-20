@@ -1,0 +1,32 @@
+cat > .gitignore <<'EOF'
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+
+# Local data & secrets
+*.db
+*.sqlite3
+.env
+.env.local
+secrets/
+credentials.json
+mosquitto-data/
+passwd.txt
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs (реални, не шаблона)
+logs/*
+!logs/test-log-template.md
+EOF
