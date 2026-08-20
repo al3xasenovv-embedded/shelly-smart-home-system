@@ -1,27 +1,33 @@
-# ADR-0005: Thermostat implemented as logical heating-demand signal
+# ADR-0004: Consolidate climate, humidity control, and thermostat logic into one script
 
 ## Status
 Accepted
 
 ## Context
-Task requirement #3 asks for a thermostat using built-in Shelly
-components. The provided hardware set does not include a physical
-heating relay or TRV — the only controllable actuator (Shelly Plug S)
-is already allocated to the humidity control system
-(see ADR-0004: consolidate-climate-scripts, and docs/01-devices.md).
+The BLU Gateway Gen3 enforces a hard limit of 3 concurrently running
+scripts (confirmed via RPC error `-108`: "Reached the maximum 3 of
+running scripts"). Two script slots were already occupied by presence
+detection (`button-presence.js`) and window state detection
+(`window-state.js`), leaving only one slot for climate monitoring,
+automatic humidity control, and the thermostat — three features that
+would otherwise be natural candidates for separate scripts.
 
 ## Decision
-The thermostat is implemented as hysteresis-based logic that computes
-a "heating demand" boolean, exposed via:
-- a virtual boolean component on the gateway (visible in the Shelly
-  app, alongside Home/Away)
-- an MQTT topic (home/thermostat)
-
-No physical actuator is switched. The signal represents what a real
-heating relay would do, and is ready to drive one if hardware is added.
+Climate monitoring, automatic humidity control, and thermostat logic
+are implemented together in a single script,
+`scripts/gateway/climate-monitor.js`, rather than as three independent
+scripts.
 
 ## Consequences
-- Fully testable and demonstrable logic without additional hardware.
-- Does not physically control temperature in this deployment.
-- If a heating relay/TRV becomes available, only the actuator call
-  needs to be added — the decision logic is already complete.
+- All three features share sensor state (e.g. temperature) directly
+  as in-memory variables, avoiding redundant reads.
+- The script is larger and less modular than three separate files
+  would be, but each concern is still clearly separated into its own
+  section and functions within the file.
+- Any future feature requiring gateway-side logic will need to either
+  extend this script further or replace one of the three existing
+  scripts, since no script slots remain.
+- Startup sequencing required care: multiple parallel `Shelly.call`
+  requests on script start triggered a "Too many calls in progress"
+  error, resolved by chaining the seed calls sequentially (see
+  `docs/09-troubleshooting.md`).

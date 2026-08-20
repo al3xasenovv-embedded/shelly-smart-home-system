@@ -5,10 +5,10 @@
 | Device | Model | Identifier | Connectivity | Role |
 |---|---|---|---|---|
 | BLU Gateway Gen3 | S3GW-1DBT001 | `shellyblugwg3-b81f3f5ffe00` | Wi-Fi + BLE | Hub / business logic |
-| BLU Button Tough 1 ZB | — | `bthomedevice:200` | BLE via gateway | Presence detection |
-| BLU Door/Window ZB | — | TBD | BLE via gateway | Window: 3-state detection |
-| BLU H&T ZB | — | `bthomedevice:202` | BLE via gateway | Temperature + humidity monitoring |
-| Shelly Plug S Gen3 | — | TBD | Wi-Fi | Humidity control (actuator) |
+| BLU Button Tough 1 ZB | SBBT-102C | `bthomedevice:200` | BLE via gateway | Presence detection |
+| BLU Door/Window ZB | SBDW-103C | `bthomedevice:201` | BLE via gateway | Window: 3-state detection |
+| BLU H&T ZB | SBHT-203C | `bthomedevice:202` | BLE via gateway | Temperature + humidity monitoring |
+| Shelly Plug S Gen3 | S3PL-00112EU | `shellyplugsg3-34b7dac84ec0` | Wi-Fi | Humidity control (actuator) |
 
 
 ## Roles
