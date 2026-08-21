@@ -20,11 +20,21 @@ with — not replacing — the explicit button press.
 
 ## Static IP addresses / DHCP reservations
 
-All device IPs (gateway, Plug S, broker machine) are currently
-DHCP-assigned, not reserved. A router restart could reassign them,
-breaking the gateway's MQTT connection and the humidity-control
-script's HTTP calls to the Plug S. Should be addressed via DHCP
-reservations in the router before any long-term deployment.
+Static addressing is the norm for devices that other devices talk to
+by address, and any real installation would use it from the start.
+This project is the exception: the gateway, the Plug S and the broker
+machine all run on DHCP-assigned addresses, because the setup was
+built and torn down repeatedly on a home network where fixing
+addresses would have slowed the work down more than it helped.
+
+The cost of that shortcut is real. A router restart can reassign any
+of the three, which breaks the gateway's MQTT connection and the
+humidity-control script's HTTP calls to the Plug S — both of which
+address their targets by IP. Nothing in the system detects this; it
+simply stops working.
+
+For anything beyond a demonstration, reserve all three addresses in
+the router before deploying.
 
 ## TLS for MQTT
 
@@ -56,9 +66,9 @@ KVS, but never mirrors it to a virtual component the way
 therefore invisible in the Shelly app, which shows only the raw contact
 and rotation sensors.
 
-Mirroring it would need either a boolean per state or a `number:`
-component holding an encoded state, since the gateway has no enum-style
-virtual component.
+An enum virtual component fits this directly — one component holding
+`closed` / `tilted` / `open` — which is closer to the state machine than
+a boolean per state would be.
 
 ## Move the IFTTT webhook key out of the script
 
@@ -94,13 +104,12 @@ All testing performed so far was manual and interactive (see
   design (see `adr/0001-*`), but a controlled write path could be
   added without breaking that principle if scoped carefully.
 
-## Cross-device rules (the largest untapped area)
+## Cross-device rules
 
 Each subsystem in this project currently observes its own sensor and
 acts on its own. The one exception is the Away notification, which
 combines presence with window state (`adr/0007-*`) — and it works
-because gateway scripts, which cannot share variables, can share the
-key-value store.
+because the two scripts involved share the key-value store.
 
 That mechanism is general. Several rules are one `KVS.Get` away from
 being possible, and each is a rule that a commercial system would be
@@ -158,12 +167,3 @@ window is open. A `window_hold` (or more generally a `reason`) field in
 `home/thermostat` would let the monitoring app show why the system is
 idle, at the cost of a payload change and a matching update to the
 app's decoder, models and UI.
-
-## Additional gateway script capacity
-
-The gateway's hard limit of 3 concurrently running scripts
-(`adr/0004-*`) required consolidating climate monitoring, humidity
-control, and thermostat logic into a single script. If a future
-gateway firmware or hardware revision raises this limit, the logic
-could be split back into more focused, independently deployable
-scripts.

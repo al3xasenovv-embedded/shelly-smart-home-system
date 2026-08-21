@@ -56,10 +56,6 @@ Not paired via the gateway — connects directly to Wi-Fi.
 
 ## Notes
 
-- All three BLU sensors are "ZB" (dual Bluetooth + Zigbee) models.
-  Ensure they are paired in **Bluetooth** mode, not Zigbee — pairing
-  via a Zigbee coordinator first can prevent BLE pairing with the
-  gateway. See `docs/09-troubleshooting.md`.
 - After a firmware update performed via a third-party tool, BLE
   bonding can break, causing a "no gateway" error on the device. Fix:
   remove the device from the gateway, power-cycle it, and re-pair.

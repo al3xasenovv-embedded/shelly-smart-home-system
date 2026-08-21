@@ -44,8 +44,7 @@ BLU Button ──BLE──> button-presence.js
 `window-state.js` persists its three-state classification under the
 KVS key `window_state`. `button-presence.js` reads that key at the
 moment of the Away transition, in `checkWindowAndNotify()`. KVS is the
-channel between them: gateway scripts run isolated from each other and
-cannot share variables, but they can share the key-value store.
+channel between the two scripts.
 
 The IFTTT applet is the simplest possible one — *if a webhook request
 is received, send a notification*. It holds no logic and knows nothing

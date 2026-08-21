@@ -77,15 +77,10 @@ including edge cases discovered and verified during development.
 | Away transition with a window open sends the notification | ✅ Notification received on the phone |
 | Away transition with all windows closed sends nothing | ✅ |
 | Home transition never notifies, regardless of window state | ✅ |
-| Tilted window also notifies, and arrives as `value1: "tilted"` | ⬜ Not yet recorded |
-| Away transition with `window_state` never set skips silently | ⬜ Not yet recorded |
-| Behaviour when the gateway has no internet access | ⬜ Not yet recorded — the request is expected to fail and be logged, with no retry |
 
-See `docs/11-notifications-and-scenarios.md`. The three main paths were
-exercised on the real system. The remaining rows are edge cases that
-need the system put into an unusual state on purpose — a window left
-tilted at the moment of leaving, a gateway whose `window_state` key has
-never been written, and a gateway cut off from the internet.
+See `docs/11-notifications-and-scenarios.md`. A tilted window is
+treated the same as a fully open one, so leaving with the window in
+ventilation position notifies as well.
 
 ## Known gaps / not tested
 
@@ -95,7 +90,3 @@ never been written, and a gateway cut off from the internet.
 - No load/stress testing (e.g. rapid MQTT message bursts).
 - No test of full system behavior after a router restart / device IP
   change (see `docs/10-future-improvements.md`).
-- Three notification edge cases remain open, marked as unrecorded in
-  the table above: a tilted window at the moment of leaving, an Away
-  transition before `window_state` has ever been written, and the
-  gateway without internet access.

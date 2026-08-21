@@ -50,9 +50,8 @@ State is persisted via KVS (key `window_state`), surviving gateway
 reboots.
 
 The KVS value is not just persistence — it is also how
-`button-presence.js` learns the window state, since gateway scripts
-cannot share variables. The Away notification scenario reads it at the
-moment of the transition (see
+`button-presence.js` learns the window state. The Away notification
+scenario reads it at the moment of the transition (see
 `docs/11-notifications-and-scenarios.md`). Renaming the key would
 silently break that scenario.
 

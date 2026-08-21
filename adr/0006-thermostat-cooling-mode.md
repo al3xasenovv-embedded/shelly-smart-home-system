@@ -29,9 +29,8 @@ means cooling demand. Consumers read `mode` and `heating_demand`
 together to interpret it.
 
 ## Rationale
-- The Shelly app can only render a virtual boolean as a plain toggle;
-  it has no enum or selector component. Two toggles are the only way
-  to expose three modes in the app without a custom UI.
+- Two toggles map directly onto the two things being switched, and both
+  are visible at a glance in the Shelly app without opening a selector.
 - Enforcing exclusivity in the script rather than trusting the user
   keeps the state machine total — there is no "both on" state to
   define behavior for.
@@ -52,5 +51,5 @@ together to interpret it.
   repository.
 - Adding a third mode (e.g. "auto changeover") would need a third
   toggle and would make the mutual-exclusion logic noticeably worse.
-  At that point an enum-style component, or a single `number:` used as
-  a mode selector, would be the better representation.
+  At that point a single component holding the mode as one value would
+  be the better representation.
