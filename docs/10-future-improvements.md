@@ -94,6 +94,71 @@ All testing performed so far was manual and interactive (see
   design (see `adr/0001-*`), but a controlled write path could be
   added without breaking that principle if scoped carefully.
 
+## Cross-device rules (the largest untapped area)
+
+Each subsystem in this project currently observes its own sensor and
+acts on its own. The one exception is the Away notification, which
+combines presence with window state (`adr/0007-*`) — and it works
+because gateway scripts, which cannot share variables, can share the
+key-value store.
+
+That mechanism is general. Several rules are one `KVS.Get` away from
+being possible, and each is a rule that a commercial system would be
+expected to have.
+
+### The thermostat should defer to the window
+
+Conditioning a room that is open to the outside is wasted work. While
+`window_state` is anything other than `closed`, heating and cooling
+demand should be held off, with mode and setpoint left untouched so
+that closing the window resumes exactly what was configured.
+
+Two properties matter for a correct implementation:
+
+- **Fail open.** An unknown or unreadable `window_state` should be
+  treated as closed. Refusing to heat because a KVS key is missing
+  turns a small failure into a cold room.
+- **Poll, do not only react.** Temperature reports are infrequent, so a
+  version that re-checks the window only when a reading arrives would
+  not notice an open window for minutes.
+
+**This was attempted and reverted.** A version that cached the window
+state and refreshed it from KVS — at startup, on each temperature
+reading, and on the existing 60-second timer — broke other behaviour on
+the gateway and was rolled back. The suspected cause is the platform
+limit this project has already hit once: issuing several asynchronous
+`Shelly.call` requests close together produces "Too many calls in
+progress" (see `docs/09-troubleshooting.md` and `adr/0004-*`). The
+refresh added a `KVS.Get` into handlers that were already issuing a
+`KVS.Set`, and into a startup chain that was already five calls deep.
+
+A working version would have to add no concurrent calls at all — for
+example by folding the window read into the existing sequential seeding
+chain and the 60-second timer only, never inside the temperature
+handler, and accepting the resulting delay in reacting.
+
+### The humidity control should defer to the window too
+
+The same argument applies to the plug: dehumidifying against outside
+air achieves nothing. The same `window_state` key is available, and the
+constraint above applies equally.
+
+### Presence should influence the climate
+
+Presence is tracked, persisted and published, but nothing consumes it
+except the notification. The standard rule — a setback temperature
+while the house is empty, restored on return — needs no new hardware
+and no new sensor, only the `presence_state` key that already exists.
+
+### Making the reason visible
+
+None of these rules are distinguishable in the MQTT payload. A consumer
+sees `heating_demand: false` whether the room is warm enough or the
+window is open. A `window_hold` (or more generally a `reason`) field in
+`home/thermostat` would let the monitoring app show why the system is
+idle, at the cost of a payload change and a matching update to the
+app's decoder, models and UI.
+
 ## Additional gateway script capacity
 
 The gateway's hard limit of 3 concurrently running scripts
