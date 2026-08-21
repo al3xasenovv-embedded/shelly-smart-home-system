@@ -9,24 +9,27 @@ scripts. No cloud services and no logic in the desktop application: the
 gateway decides, publishes state to a local MQTT broker, and the
 monitoring app is a read-only consumer of that stream.
 
-## Requirements status
+## Task status
 
-The full task text is in [docs/00-overview.md](docs/00-overview.md).
+The eleven tasks below are the assignment verbatim, in its original
+order and numbering. The full task text is in
+[docs/00-overview.md](docs/00-overview.md).
 
-| # | Requirement | Status | Where |
+| # | Task | Status | Where |
 |---|---|---|---|
-| 1 | All devices added and configured in the Shelly profile | Done | [docs/01-devices.md](docs/01-devices.md) |
-| 2 | Each device assigned a clearly defined role | Done | [docs/01-devices.md](docs/01-devices.md) |
-| 3 | Thermostat using built-in Shelly components | Done — logical signal | [docs/06-thermostat.md](docs/06-thermostat.md), [ADR-0005](adr/0005-thermostat-as-logical-signal.md) |
-| 4 | Presence detection using the Bluetooth button | Done | [docs/04-presence.md](docs/04-presence.md), [ADR-0002](adr/0002-use-button-as-presence-token.md) |
-| 5 | Door/window sensor: all three window states | Done | [docs/05-window-state.md](docs/05-window-state.md) |
-| 6 | Business logic implemented and stored on the hub | Done | [scripts/gateway/](scripts/gateway/), [ADR-0001](adr/0001-hub-centric-business-logic.md) |
-| 7 | Automatic humidity control (hub + Plug S + H&T) | Done | [docs/07-humidity-control.md](docs/07-humidity-control.md) |
-| 8 | GitHub repository with all project materials | Done | [docs/](docs/), [diagrams/](diagrams/), [adr/](adr/) |
-| 9 | Incremental, logically separated commits (skeleton first) | Done | [CHANGELOG.md](CHANGELOG.md) |
-| 10 | Monitoring application visualizing all device data | Done | [app/](app/) |
+| 1 | Create a Shelly profile, or use an existing one | Done | [docs/03-pairing-guide.md](docs/03-pairing-guide.md) |
+| 2 | All provided devices added and configured in the Shelly profile | Done | [docs/01-devices.md](docs/01-devices.md), [docs/03-pairing-guide.md](docs/03-pairing-guide.md) |
+| 3 | Each device assigned a clearly defined role | Done | [docs/01-devices.md](docs/01-devices.md) |
+| 4 | Thermostat using the ready-made Shelly components | Done — logical signal | [docs/06-thermostat.md](docs/06-thermostat.md), [ADR-0005](adr/0005-thermostat-as-logical-signal.md), [ADR-0006](adr/0006-thermostat-cooling-mode.md) |
+| 5 | Presence detection using the Bluetooth button | Done | [docs/04-presence.md](docs/04-presence.md), [ADR-0002](adr/0002-use-button-as-presence-token.md) |
+| 6 | Door/window sensor: all three states of a single-leaf window | Done | [docs/05-window-state.md](docs/05-window-state.md) |
+| 7 | Business logic implemented and stored on the hub, using the button | Done | [scripts/gateway/](scripts/gateway/), [ADR-0001](adr/0001-hub-centric-business-logic.md) |
+| 8 | Automatic humidity control (hub + Plug S + H&T sensor) | Done | [docs/07-humidity-control.md](docs/07-humidity-control.md) |
+| 9 | GitHub repository holding everything developed for these tasks | Done | [docs/](docs/), [diagrams/](diagrams/), [adr/](adr/), [images/](images/) |
+| 10 | Progress documented in clear, logically separated commits, repository structure first | Done | [CHANGELOG.md](CHANGELOG.md) |
+| 11 | Monitoring application visualizing data from all devices | Done | [app/](app/) |
 
-**Requirement 3 caveat:** the provided hardware includes no heating
+**Task 4 caveat:** the provided hardware includes no heating
 relay or TRV, and the only controllable actuator (Shelly Plug S) is
 allocated to humidity control. The thermostat therefore computes a
 *demand* boolean with full hysteresis logic in both heating and cooling
@@ -254,7 +257,7 @@ Full configuration reference: [app/README.md](app/README.md).
 ## Known limitations
 
 - The thermostat drives no physical actuator, in either heating or
-  cooling mode (see requirement 3 above).
+  cooling mode (see task 4 above).
 - The demand flag is published as `heating_demand` in both modes; in
   cooling mode a true value means cooling demand. Consumers must read
   `mode` alongside it — see [ADR-0006](adr/0006-thermostat-cooling-mode.md).

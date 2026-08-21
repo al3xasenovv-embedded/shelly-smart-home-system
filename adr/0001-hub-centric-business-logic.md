@@ -6,7 +6,7 @@ Accepted
 ## Context
 Shelly devices support multiple places where automation logic could
 live: Shelly Cloud scenes, the monitoring application, or scripts
-running directly on the BLU Gateway Gen3 itself. Task requirement #6
+running directly on the BLU Gateway Gen3 itself. Task requirement #7
 explicitly asks for logic to be "implemented and stored on the hub."
 
 ## Decision

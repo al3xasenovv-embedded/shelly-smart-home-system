@@ -1,7 +1,7 @@
 # Monitoring Application
 
 Python desktop application that visualizes live data from all Shelly
-devices in the system (task requirement #10).
+devices in the system (task requirement #11).
 
 Communicates via MQTT with the local broker, consuming the topics
 published by the gateway scripts (see scripts/gateway/):

@@ -4,7 +4,7 @@
 Accepted
 
 ## Context
-Task requirement #10 allows either MQTT or HTTP for device
+Task requirement #11 allows either MQTT or HTTP for device
 communication. Both were available on the gateway and Plug S.
 
 ## Decision

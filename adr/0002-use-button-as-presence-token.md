@@ -4,7 +4,7 @@
 Accepted
 
 ## Context
-Task requirement #4 asks for a presence detection system using the
+Task requirement #5 asks for a presence detection system using the
 Bluetooth button. A passive alternative was considered: tracking BLE
 advertisement "last seen" timestamps from the button and inferring
 absence after a timeout of missed heartbeats.

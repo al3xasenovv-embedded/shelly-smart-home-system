@@ -43,7 +43,7 @@ changes from the Shelly app, with no script edit and no restart.
   changes with the season, the time of day, and who is home. A value
   like that belongs in the app, not in a source file.
 - Implementing the thermostat with virtual components also satisfies
-  requirement #3 more directly, since it asks for a thermostat built
+  requirement #4 more directly, since it asks for a thermostat built
   from the ecosystem's own components.
 
 ## Consequences

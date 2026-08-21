@@ -5,7 +5,7 @@ Accepted. Extended by ADR-0006, which adds a cooling mode on top
 of the same logical-signal approach.
 
 ## Context
-Task requirement #3 asks for a thermostat using built-in Shelly
+Task requirement #4 asks for a thermostat using built-in Shelly
 components. The provided hardware set does not include a physical
 heating relay or TRV — the only controllable actuator (Shelly Plug S)
 is already allocated to the humidity control system

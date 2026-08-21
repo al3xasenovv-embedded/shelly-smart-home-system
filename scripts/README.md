@@ -1,7 +1,7 @@
 # Gateway Scripts
 
 Scripts running directly on the BLU Gateway Gen3, implementing part of
-the system's business logic locally on the hub (task requirement #6).
+the system's business logic locally on the hub (task requirement #7).
 
 ## button-presence.js
 

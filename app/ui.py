@@ -1,6 +1,6 @@
 """Live-updating window showing current state of all devices, styled
 with CustomTkinter for a modern dark theme.
-No history/graphs — just current values (see task requirement #10).
+No history/graphs — just current values (see task requirement #11).
 """
 
 import customtkinter as ctk
