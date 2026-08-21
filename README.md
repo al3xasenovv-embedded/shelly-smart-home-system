@@ -98,6 +98,8 @@ thermostat live in one combined script rather than three
 
 Details and gotchas: [scripts/README.md](scripts/README.md).
 
+![All three gateway scripts running](images/gateway-scripts-running.png)
+
 ### Scenarios
 
 Leaving home while a window is open sends a push notification. The
@@ -217,25 +219,7 @@ Full configuration reference: [app/README.md](app/README.md).
 
 ## Screenshots
 
-<!--
-Add images to images/ and reference them here. Suggested set:
-
-### Monitoring application
-
-![Monitoring application showing live device state](images/app-monitor.png)
-
-### Shelly app
-
-![Virtual components on the gateway](images/shelly-app-components.png)
-
-### Gateway
-
-![The three scripts running on the gateway](images/gateway-scripts.png)
-
-### Hardware
-
-![The BLU devices installed](images/hardware-setup.jpg)
--->
+![Monitoring app: Away state with active Heating](images/monitoring-app-away-heating.png)
 
 ## Documentation
 

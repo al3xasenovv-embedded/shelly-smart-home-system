@@ -16,6 +16,8 @@ while somebody is home is normal and must stay silent; the same window
 open as the last person leaves is worth a notification, because nobody
 is left to notice it.
 
+![Push notification received on the phone via IFTTT](../images/phone-notification.jpg)
+
 ## How it works
 
 The decision is made on the gateway. IFTTT only delivers the message.

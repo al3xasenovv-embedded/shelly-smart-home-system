@@ -65,6 +65,8 @@ RPC methods return 404 on this firmware. If `boolean:203` is missing,
 the script's startup seeding logs an error and cooling silently
 defaults to off.
 
+![Thermostat virtual components (Setpoint, Heating Demand, HEATING, COOLING) in the Shelly app](../images/shelly-app-thermostat-group.jpg)
+
 ## Implementation
 
 Part of the combined `scripts/gateway/climate-monitor.js` script (see
@@ -88,4 +90,7 @@ rationale.
 
 Consumers must therefore read `mode` together with `heating_demand` to
 know what an active demand actually means. The monitoring app does
-exactly this in `app/ui.py`.
+exactly this in `app/ui.py` — an active demand in cooling mode is
+labelled accordingly, not as heating:
+
+![Monitoring app showing active Cooling mode](../images/monitoring-app-cooling.png)

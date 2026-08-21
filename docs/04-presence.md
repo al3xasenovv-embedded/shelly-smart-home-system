@@ -21,6 +21,8 @@ the BLU Gateway Gen3.
 - Mirrored to a virtual boolean component (`boolean:200`, "Home/Away")
   visible directly in the Shelly Smart Control app.
 
+![Home/Away virtual component and BLU Door/Window sensor data in the Shelly app](../images/shelly-app-presence-group.jpg)
+
 ## Behavior notes
 
 - On the Away transition the script reads the window state from KVS
@@ -32,3 +34,7 @@ the BLU Gateway Gen3.
   auto-start — see `docs/09-troubleshooting.md`.
 - State correctly resumes from the last known value after a reboot
   (verified: KVS persists across `Shelly.Reboot`).
+
+The state as the monitoring app renders it:
+
+![Monitoring app showing Away presence state](../images/monitoring-app-away-heating.png)

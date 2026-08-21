@@ -21,6 +21,10 @@ Verify with:
 curl -X POST -d '{"id":1,"method":"Script.GetConfig","params":{"id":1}}' http://<gateway-ip>/rpc
 ```
 
+All three scripts correctly configured, with "Run on startup" enabled:
+
+![All three gateway scripts running with "Run on startup" enabled](../images/gateway-scripts-running.png)
+
 
 ## Script state desyncs from physical device after restart
 

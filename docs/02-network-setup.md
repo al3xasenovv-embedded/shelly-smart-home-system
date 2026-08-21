@@ -20,6 +20,8 @@ Setup steps and issues encountered are documented in
 failed due to `Program Files` write permissions; a startup `.bat`
 script is used instead).
 
+![Live MQTT traffic showing all published topics](../images/mqtt-live-traffic.png)
+
 ## Device IP addresses
 
 | Device | IP | Notes |

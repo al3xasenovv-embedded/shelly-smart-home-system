@@ -21,6 +21,12 @@ contact = false → closed
 contact = true, rotation = 0 → open
 contact = true, rotation != 0 → tilted
 
+The two non-closed states as the monitoring app renders them:
+
+![Monitoring app showing window state: Tilted](../images/monitoring-app-window-tilted.png)
+
+![Monitoring app showing window state: Open](../images/monitoring-app-window-open.png)
+
 
 ## Async event handling
 
