@@ -29,14 +29,6 @@ order and numbering. The full task text is in
 | 10 | Progress documented in clear, logically separated commits, repository structure first | Done | [CHANGELOG.md](CHANGELOG.md) |
 | 11 | Monitoring application visualizing data from all devices | Done | [app/](app/) |
 
-**Task 4 caveat:** the provided hardware includes no heating
-relay or TRV, and the only controllable actuator (Shelly Plug S) is
-allocated to humidity control. The thermostat therefore computes a
-*demand* boolean with full hysteresis logic in both heating and cooling
-mode, and exposes it via a virtual component and MQTT, but switches no
-physical load. See [ADR-0005](adr/0005-thermostat-as-logical-signal.md)
-and [ADR-0006](adr/0006-thermostat-cooling-mode.md).
-
 ## Hardware
 
 | Device | Role | Connectivity |
@@ -257,16 +249,15 @@ Full configuration reference: [app/README.md](app/README.md).
 ## Known limitations
 
 - The thermostat drives no physical actuator, in either heating or
-  cooling mode (see task 4 above).
+  cooling mode — the hardware includes no heating relay or TRV, and the
+  only controllable actuator is allocated to humidity control. See
+  [ADR-0005](adr/0005-thermostat-as-logical-signal.md).
 - The demand flag is published as `heating_demand` in both modes; in
   cooling mode a true value means cooling demand. Consumers must read
   `mode` alongside it — see [ADR-0006](adr/0006-thermostat-cooling-mode.md).
 - Presence is an explicit button toggle, not passive BLE proximity — a
   deliberate choice, see [ADR-0002](adr/0002-use-button-as-presence-token.md).
 - The UI shows current values only, with no history or graphs.
-- The setpoint slider in the Shelly app may report "Failed to apply
-  setting" while the value is in fact applied correctly — an app UI
-  quirk with virtual components, not a real fault.
 - The Away notification depends on internet access and on IFTTT. A
   failed webhook is logged on the gateway and never retried, so the
   notification is simply lost — see

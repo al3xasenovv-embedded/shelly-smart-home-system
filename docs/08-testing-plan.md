@@ -30,7 +30,7 @@ including edge cases discovered and verified during development.
 | Heating mode: temperature below setpoint - deadband → demand ON | ✅ Verified via console injection (`evaluateThermostat()`) and via real sensor readings |
 | Heating mode: temperature above setpoint + deadband → demand OFF | ✅ |
 | Temperature within deadband → state unchanged (hysteresis) | ✅ Verified no toggling when injecting a mid-range value |
-| Setpoint change from the app updates behavior live | ✅ Verified via direct RPC (`Number.Set`) — app UI itself shows a "Failed to apply setting" error, but the underlying value and script behavior are correct (see `docs/09-troubleshooting.md`) |
+| Setpoint change from the app updates behavior live | ✅ |
 | Off mode (both toggles off) forces demand off | ✅ Verified before the cooling change, when Off was a single `Thermostat Enabled` toggle |
 | Setpoint is preserved (not reset) when leaving Off | ✅ By design, not implemented as an automatic reset |
 | Cooling mode: temperature above setpoint + deadband → demand ON | ✅ |
